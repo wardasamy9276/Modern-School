@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   output: "export",
 
   basePath: "/Modern-School",
+  assetPrefix: "/Modern-School/",
 
   images: {
     unoptimized: true,

@@ -17,11 +17,11 @@ export default function VisionMission() {
   const { language } = useLanguage() as { language: "ar" | "en" };
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-
+// image: "/Modern-School/assets/img/Modern Al Shams School1.jpeg",
   // بيانات افتراضية تظهر احتياطياً لضمان عدم ظهور القسم فارغاً
   const fallbackItems: Item[] = [
     {
-      image: "/assets/img/Modern Al Shams School1.jpeg",
+      image: "/Modern-School/assets/img/Modern Al Shams School1.jpeg",
       title: language === "ar" ? "رؤيتنا التعليمية" : "Our Vision",
       description:
         language === "ar"
@@ -34,7 +34,7 @@ export default function VisionMission() {
       btnText: language === "ar" ? "اقرأ المزيد" : "Read More",
     },
     {
-      image: "/assets/img/New Cairo Schools7.jpeg",
+      image: "/Modern-School/assets/img/New Cairo Schools7.jpeg",
       title: language === "ar" ? "رسالتنا" : "Our Mission",
       description:
         language === "ar"
@@ -47,7 +47,7 @@ export default function VisionMission() {
       btnText: language === "ar" ? "اقرأ المزيد" : "Read More",
     },
     {
-      image: "/assets/img/Ebdaah International School8.jpeg",
+      image: "/Modern-School/assets/img/Ebdaah International School8.jpeg",
       title: language === "ar" ? "أهدافنا الإستراتيجية" : "Strategic Goals",
       description:
         language === "ar"
