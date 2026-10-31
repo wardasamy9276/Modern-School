@@ -1,9 +1,10 @@
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
 
-  basePath: "/Al-Rowad-Modern-School-",
+  basePath: "/Modern-School",
 
   images: {
     unoptimized: true,
