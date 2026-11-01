@@ -712,6 +712,7 @@
 //   );
 // }
 
+
 "use client";
 
 import React from "react";
@@ -731,6 +732,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Menu,
 } from "lucide-react";
 
 type MenuItem = {
@@ -814,6 +816,18 @@ export default function Sidebar({
 
   return (
     <>
+      {/* Mobile Menu Button */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="فتح القائمة"
+          className="fixed top-4 right-4 z-40 lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950 text-white shadow-lg border border-slate-800"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <button
@@ -824,7 +838,7 @@ export default function Sidebar({
         />
       )}
 
-      {/* ================= SIDEBAR ================= */}
+      {/* SIDEBAR */}
       <aside
         className={`
           fixed
@@ -845,7 +859,7 @@ export default function Sidebar({
           ${sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Logo & Collapse Button Container */}
+        {/* Logo & Collapse Button */}
         <div className="h-20 px-4 flex items-center justify-between border-b border-slate-800 shrink-0 relative">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 shrink-0">
@@ -854,13 +868,17 @@ export default function Sidebar({
 
             {!isCollapsed && (
               <div className="truncate">
-                <h1 className="font-black text-lg truncate">Smart Schools</h1>
-                <p className="text-xs text-slate-500">School Management</p>
+                <h1 className="font-black text-lg truncate">
+                  Al Rowad Modern School
+                </h1>
+                <p className="text-xs text-slate-500">
+                  Al Rowad Modern School Management
+                </p>
               </div>
             )}
           </div>
 
-          {/* زر السهم للتوسيع والتصغير في المنتصف بجوار اللوجو */}
+          {/* Desktop Collapse Button */}
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -874,10 +892,12 @@ export default function Sidebar({
             )}
           </button>
 
+          {/* Mobile Close Button */}
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-slate-400 hover:text-white"
+            aria-label="إغلاق القائمة"
           >
             <X className="w-5 h-5" />
           </button>
@@ -891,9 +911,14 @@ export default function Sidebar({
                 <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                   <UserRound className="w-5 h-5" />
                 </div>
+
                 <div className="min-w-0">
-                  <p className="font-bold text-sm truncate">مدير النظام</p>
-                  <p className="text-xs text-slate-500 mt-1">Administrator</p>
+                  <p className="font-bold text-sm truncate">
+                    مدير النظام
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Administrator
+                  </p>
                 </div>
               </div>
             </div>
@@ -911,7 +936,8 @@ export default function Sidebar({
           {menuItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== "/dashboard" && pathname?.startsWith(item.href));
+              (item.href !== "/dashboard" &&
+                pathname?.startsWith(item.href));
 
             return (
               <Link
@@ -939,7 +965,9 @@ export default function Sidebar({
               >
                 {item.icon}
 
-                {!isCollapsed && <span className="truncate">{item.title}</span>}
+                {!isCollapsed && (
+                  <span className="truncate">{item.title}</span>
+                )}
 
                 {!isCollapsed && isActive && (
                   <span className="mr-auto w-2 h-2 rounded-full bg-white shrink-0" />

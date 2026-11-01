@@ -23,7 +23,7 @@ export default function Navbar() {
     return () => clearTimeout(timer);
   }, []);
 
-  const whatsappNumber = "+201000000000";
+  const whatsappNumber = "+201040381899";
   const whatsappMessage = encodeURIComponent(
     "مرحباً، أرغب الاستفسار عن منظومة Smart Star لـ Smart School",
   );
@@ -91,11 +91,10 @@ export default function Navbar() {
             <Link href="/" className="flex items-center">
               <Image
                 src="/assets/image.png"
-               
                 alt={t.logoAlt}
                 width={80}
                 height={80}
-                className="w-14 md:w-16 h-14 md:h-16 object-contain"
+                className=" md:w-16 h-14 md:h-16 object-contain"
                 priority
               />
             </Link>
