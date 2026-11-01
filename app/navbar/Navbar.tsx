@@ -94,7 +94,7 @@ export default function Navbar() {
                 alt={t.logoAlt}
                 width={80}
                 height={80}
-                className=" md:w-16 h-14 md:h-16 object-contain"
+                className="w-14 md:w-16 h-14 md:h-16 object-contain"
                 priority
               />
             </Link>
@@ -191,7 +191,7 @@ export default function Navbar() {
               <hr className="my-2 border-gray-200" />
 
               <Link
-                href="/login"
+                href="/dashboard"
                 onClick={() => setOpen(false)}
                 className="w-full py-2.5 text-center rounded-md bg-cyan-800 text-white font-medium hover:bg-cyan-900 transition-colors"
               >
