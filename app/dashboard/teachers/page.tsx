@@ -20,7 +20,7 @@ import {
   UserRound,
   ChevronDown,
 } from "lucide-react";
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 
 const API_URL = "http://localhost:8000/api";

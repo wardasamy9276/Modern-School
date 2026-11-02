@@ -3,6 +3,7 @@
 import DashboardOverview from "./homepage/DashboardOverview";
 import React, { useEffect, useState } from "react";
 import StatsGrid from "./homepage/StatsGrid";
+import Analytics from "../dashboard/analytics/analytics"
 
 export default function DashboardPage() {
   // ================= SCHOOLS =================
@@ -42,6 +43,7 @@ export default function DashboardPage() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#f5f7fb] text-slate-800">
+   
       {/* ================= MAIN CONTENT ================= */}
       <main className="w-full min-w-0 p-4 sm:p-6 lg:p-8">
         {/* ================= PAGE HEADER ================= */}
@@ -77,6 +79,7 @@ export default function DashboardPage() {
 
         {/* ================= DASHBOARD OVERVIEW ================= */}
         <DashboardOverview />
+           <Analytics />
       </main>
     </div>
   );

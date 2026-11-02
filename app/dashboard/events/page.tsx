@@ -17,7 +17,7 @@ import {
   PartyPopper,
 } from "lucide-react";
 
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 
 type EventType = "فعالية" | "اجتماع" | "رحلة" | "مسابقة" | "احتفال" | "إعلان";

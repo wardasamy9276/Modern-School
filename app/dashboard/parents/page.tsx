@@ -18,7 +18,7 @@ import {
   UserRoundCheck,
 } from "lucide-react";
 
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface Parent {
   id: number;

@@ -18,7 +18,7 @@ import {
   Plus,
 } from "lucide-react";
 
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 
 interface AttendanceRecord {

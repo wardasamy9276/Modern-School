@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 import {
   Search,

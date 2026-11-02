@@ -1,11 +1,15 @@
 
 import type { NextConfig } from "next";
 
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+
 const nextConfig: NextConfig = {
   output: "export",
 
-  basePath: "/Modern-School",
-  assetPrefix: "/Modern-School/",
+  ...(isGitHubPages && {
+    basePath: "/Modern-School",
+    assetPrefix: "/Modern-School/",
+  }),
 
   images: {
     unoptimized: true,

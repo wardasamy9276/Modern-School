@@ -713,11 +713,17 @@
 // }
 
 
+
+
+
 "use client";
 
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "../context/LanguageContext";
+import { Home } from "lucide-react";
+
 import {
   LayoutDashboard,
   GraduationCap,
@@ -733,6 +739,7 @@ import {
   ChevronRight,
   X,
   Menu,
+  Languages,
 } from "lucide-react";
 
 type MenuItem = {
@@ -756,63 +763,80 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
 
+  // استخدام نفس نظام الترجمة الموجود في Navbar
+  const { language, t, toggleLanguage } = useLanguage();
+
+  const isArabic = language === "ar";
+
+  // ترجمة عناصر Dashboard
   const menuItems: MenuItem[] = [
     {
-      title: "الرئيسية",
+      title: isArabic ? "الرئيسية" : "Dashboard",
       href: "/dashboard",
       icon: <LayoutDashboard className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "الطلاب",
+      title: isArabic ? "الطلاب" : "Students",
       href: "/dashboard/students",
       icon: <GraduationCap className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "المعلمون",
+      title: isArabic ? "المعلمون" : "Teachers",
       href: "/dashboard/teachers",
       icon: <UserCheck className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "أولياء الأمور",
+      title: isArabic ? "أولياء الأمور" : "Parents",
       href: "/dashboard/parents",
       icon: <UserRound className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "المدارس",
+      title: isArabic ? "المدارس" : "Schools",
       href: "/dashboard/schools",
       icon: <School className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "الفصول",
+      title: isArabic ? "الفصول" : "Classes",
       href: "/dashboard/classes",
       icon: <BookOpen className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "المواد الدراسية",
+      title: isArabic ? "المواد الدراسية" : "Subjects",
       href: "/dashboard/subjects",
       icon: <BookOpen className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "الأخبار والمقالات",
+      title: isArabic ? "الأخبار والمقالات" : "News & Articles",
       href: "/dashboard/articles",
       icon: <Newspaper className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "الأحداث",
+      title: isArabic ? "الأحداث" : "Events",
       href: "/dashboard/events",
       icon: <CalendarDays className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "الحضور",
+      title: isArabic ? "الحضور" : "Attendance",
       href: "/dashboard/attendance",
       icon: <ClipboardCheck className="w-5 h-5 shrink-0" />,
     },
     {
-      title: "المستخدمون",
+      title: isArabic ? "المستخدمون" : "Users",
       href: "/dashboard/users",
       icon: <Users className="w-5 h-5 shrink-0" />,
     },
+  {
+  title: isArabic ? "الذكاء المدرسي" : "School Intelligence",
+  href: "/dashboard/school-intelligence",
+  icon: <Users className="w-5 h-5 shrink-0" />,
+},
   ];
+
+  
+
+
+  const languageLabel = isArabic ? "English 🌐" : "عربي 🌐";
+  
 
   return (
     <>
@@ -821,8 +845,10 @@ export default function Sidebar({
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          aria-label="فتح القائمة"
-          className="fixed top-4 right-4 z-40 lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950 text-white shadow-lg border border-slate-800"
+          aria-label={t.openMenu}
+          className={`fixed top-4 ${
+            isArabic ? "right-4" : "left-4"
+          } z-40 lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950 text-white shadow-lg border border-slate-800`}
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -832,38 +858,45 @@ export default function Sidebar({
       {sidebarOpen && (
         <button
           type="button"
-          aria-label="إغلاق القائمة"
+          aria-label={t.closeMenu}
           onClick={() => setSidebarOpen(false)}
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
         />
       )}
 
-      {/* SIDEBAR */}
+      {/* Sidebar */}
       <aside
+        dir={isArabic ? "rtl" : "ltr"}
         className={`
           fixed
           top-0
-          right-0
           z-50
           h-screen
           bg-slate-950
           text-white
-          border-l
           border-slate-800
+          ${isArabic ? "right-0 border-l" : "left-0 border-r"}
           transition-all
           duration-300
           flex
           flex-col
           ${isCollapsed ? "w-20" : "w-72"}
           lg:translate-x-0
-          ${sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : isArabic
+                ? "translate-x-full lg:translate-x-0"
+                : "-translate-x-full lg:translate-x-0"
+          }
         `}
       >
         {/* Logo & Collapse Button */}
-        <div className="h-20 px-4 flex items-center justify-between border-b border-slate-800 shrink-0 relative">
+        <div className="h-20 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 shrink-0">
               <School className="w-6 h-6 text-white" />
+              
             </div>
 
             {!isCollapsed && (
@@ -871,8 +904,11 @@ export default function Sidebar({
                 <h1 className="font-black text-lg truncate">
                   Al Rowad Modern School
                 </h1>
+
                 <p className="text-xs text-slate-500">
-                  Al Rowad Modern School Management
+                  {isArabic
+                    ? "نظام إدارة مدرسة الرواد الحديثة"
+                    : "Al Rowad Modern School Management"}
                 </p>
               </div>
             )}
@@ -883,12 +919,26 @@ export default function Sidebar({
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="hidden lg:flex p-2 rounded-xl bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 transition items-center justify-center border border-slate-800 shadow-sm"
-            title={isCollapsed ? "توسيع القائمة" : "تصغير القائمة"}
+            title={
+              isCollapsed
+                ? isArabic
+                  ? "توسيع القائمة"
+                  : "Expand Sidebar"
+                : isArabic
+                  ? "تصغير القائمة"
+                  : "Collapse Sidebar"
+            }
           >
             {isCollapsed ? (
-              <ChevronLeft className="w-5 h-5" />
-            ) : (
+              isArabic ? (
+                <ChevronLeft className="w-5 h-5" />
+              ) : (
+                <ChevronRight className="w-5 h-5" />
+              )
+            ) : isArabic ? (
               <ChevronRight className="w-5 h-5" />
+            ) : (
+              <ChevronLeft className="w-5 h-5" />
             )}
           </button>
 
@@ -897,7 +947,7 @@ export default function Sidebar({
             type="button"
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-slate-400 hover:text-white"
-            aria-label="إغلاق القائمة"
+            aria-label={t.closeMenu}
           >
             <X className="w-5 h-5" />
           </button>
@@ -914,8 +964,9 @@ export default function Sidebar({
 
                 <div className="min-w-0">
                   <p className="font-bold text-sm truncate">
-                    مدير النظام
+                    {isArabic ? "مدير النظام" : "System Administrator"}
                   </p>
+
                   <p className="text-xs text-slate-500 mt-1">
                     Administrator
                   </p>
@@ -925,11 +976,55 @@ export default function Sidebar({
           </div>
         )}
 
+        {/* Language Switcher */}
+        <div className="px-3 py-3 shrink-0">
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            title={languageLabel}
+            className={`
+              w-full flex items-center gap-3 px-4 py-3
+              rounded-xl
+              bg-cyan-800/20
+              border border-cyan-700/40
+              text-cyan-300
+              hover:bg-cyan-700
+              hover:text-white
+              transition-all duration-300
+              ${isCollapsed ? "justify-center px-2" : ""}
+            `}
+          >
+            <Languages className="w-5 h-5 shrink-0" />
+
+            {!isCollapsed && (
+              <span className="font-bold text-sm">
+                {languageLabel}
+              </span>
+            )}
+          </button>
+        </div>
+
+
+
+<Link
+  href="/"
+  className="flex items-center gap-3 px-4 py-3 mx-3 mb-4
+  rounded-xl    text-[#02a8da] hover:bg-blue-50
+  hover:text-blue-600 transition-all duration-200"
+>
+  <Home size={21} />
+  {!isCollapsed && (
+    <span className="font-semibold">
+      {isArabic ? "الصفحة الرئيسية" : "Home Page"}
+    </span>
+  )}
+</Link>
         {/* Menu Items */}
+
         <nav className="px-3 pb-5 overflow-y-auto flex-1 space-y-1 mt-2">
           {!isCollapsed && (
             <p className="text-[11px] font-bold text-slate-600 px-3 mb-3">
-              الإدارة الرئيسية
+              {isArabic ? "الإدارة الرئيسية" : "MAIN MANAGEMENT"}
             </p>
           )}
 
@@ -970,12 +1065,17 @@ export default function Sidebar({
                 )}
 
                 {!isCollapsed && isActive && (
-                  <span className="mr-auto w-2 h-2 rounded-full bg-white shrink-0" />
+                  <span
+                    className={`${
+                      isArabic ? "mr-auto" : "ml-auto"
+                    } w-2 h-2 rounded-full bg-white shrink-0`}
+                  />
                 )}
               </Link>
             );
           })}
         </nav>
+
       </aside>
     </>
   );

@@ -28,12 +28,16 @@
 //       </div>
 //     </div>
 //   );
-// }
+
+
+
+
 
 "use client";
 
 import React, { useState } from "react";
-import Sidebar from "../dashboard/Sidebar";
+import Sidebar from "./Sidebar";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function DashboardLayout({
   children,
@@ -43,9 +47,14 @@ export default function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const { language } = useLanguage();
+  const isArabic = language === "ar";
+
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-100">
-      {/* Sidebar */}
+    <div
+      dir={isArabic ? "rtl" : "ltr"}
+      className="min-h-screen bg-slate-100"
+    >
       <Sidebar
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
@@ -53,17 +62,26 @@ export default function DashboardLayout({
         setSidebarOpen={setSidebarOpen}
       />
 
-      {/* Main Area */}
       <div
         className={`
           min-h-screen
           transition-[margin]
           duration-300
           ease-in-out
-          ${isCollapsed ? "lg:mr-20" : "lg:mr-72"}
+          ${
+            isArabic
+              ? isCollapsed
+                ? "lg:mr-20"
+                : "lg:mr-72"
+              : isCollapsed
+                ? "lg:ml-20"
+                : "lg:ml-72"
+          }
         `}
       >
-        <main className="min-h-screen w-full">{children}</main>
+        <main className="min-h-screen w-full">
+          {children}
+        </main>
       </div>
     </div>
   );

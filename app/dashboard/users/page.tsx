@@ -17,7 +17,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 
-import { useLanguage } from "../../../context/LanguageContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface ClassRoom {
   id: number;
