@@ -277,7 +277,88 @@ export default function SchoolIntelligence() {
 
       {/* ================= HERO ================= */}
 
-   
+      <header className="relative mb-8 overflow-hidden rounded-[30px] bg-[#0c1e3d] p-6 text-white shadow-2xl md:p-9">
+        <div className="absolute -left-20 -top-24 h-80 w-80 rounded-full border-[35px] border-blue-500/10" />
+        <div className="absolute -bottom-36 right-1/3 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl" />
+
+        <div className="relative z-10">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-3">
+                <BrainCircuit size={30} className="text-cyan-300" />
+              </div>
+              <div>
+                <p className="text-xs font-bold tracking-widest text-cyan-300">AL ROWAD MODERN SCHOOL</p>
+                <p className="mt-1 text-sm text-blue-100">Enterprise Intelligence Platform</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-green-300/20 bg-green-400/10 px-4 py-2 text-xs font-bold text-green-300">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
+              النظام يعمل
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 items-center gap-8 xl:grid-cols-[1.5fr_1fr]">
+            <div>
+              <p className="mb-3 text-sm font-semibold text-blue-300">مركز القيادة والتحليل الاستراتيجي</p>
+              <h1 className="text-3xl font-black leading-tight md:text-5xl">
+                ذكاء المدرسة
+                <span className="mt-2 block text-cyan-300">من البيانات إلى القرار</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-sm leading-8 text-blue-100">
+                منظومة تحليل متقدمة تجمع المؤشرات التعليمية والإدارية والمالية
+                في مركز واحد، لتمنح إدارة مدرسة الرواد الحديثة رؤية شاملة
+                حول الأداء الحالي، ومقارنة النتائج، واكتشاف نقاط القوة
+                وفرص التحسين.
+              </p>
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-[#102344] transition hover:bg-cyan-50"
+                >
+                  <Download size={18} />
+                  طباعة التقرير
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("overview");
+                    setPeriod("12");
+                  }}
+                  className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 font-bold text-white hover:bg-white/20"
+                >
+                  <RefreshCw size={17} />
+                  تحديث العرض
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "مؤشر الأداء العام", value: "92.8%", icon: Gauge },
+                { label: "معدل النمو", value: "+14.8%", icon: TrendingUp },
+                { label: "جودة التعليم", value: "94/100", icon: Award },
+                { label: "كفاءة التشغيل", value: "91.5%", icon: Zap },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur">
+                    <Icon size={22} className="text-cyan-300" />
+                    <p className="mt-4 text-xs text-blue-200">{item.label}</p>
+                    <h3 className="mt-2 text-2xl font-black">{item.value}</h3>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5 text-xs text-blue-200">
+            <span className="flex items-center gap-2"><CalendarDays size={15} /> العام الدراسي 2026 / 2027</span>
+            <span className="flex items-center gap-2"><ShieldCheck size={15} /> لوحة الإدارة العليا</span>
+            <span className="flex items-center gap-2"><Activity size={15} /> التحليلات والمؤشرات المؤسسية</span>
+          </div>
+        </div>
+      </header>
 
       {/* ================= NAVIGATION ================= */}
 
@@ -889,88 +970,7 @@ export default function SchoolIntelligence() {
           </div>
         </div>
       </div>
-   {/* <header className="relative mb-8 overflow-hidden rounded-[30px] bg-[#0c1e3d] p-6 text-white shadow-2xl md:p-9">
-        <div className="absolute -left-20 -top-24 h-80 w-80 rounded-full border-[35px] border-blue-500/10" />
-        <div className="absolute -bottom-36 right-1/3 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl" />
 
-        <div className="relative z-10">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl border border-white/20 bg-white/10 p-3">
-                <BrainCircuit size={30} className="text-cyan-300" />
-              </div>
-              <div>
-                <p className="text-xs font-bold tracking-widest text-cyan-300">AL ROWAD MODERN SCHOOL</p>
-                <p className="mt-1 text-sm text-blue-100">Enterprise Intelligence Platform</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-green-300/20 bg-green-400/10 px-4 py-2 text-xs font-bold text-green-300">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-              النظام يعمل
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 items-center gap-8 xl:grid-cols-[1.5fr_1fr]">
-            <div>
-              <p className="mb-3 text-sm font-semibold text-blue-300">مركز القيادة والتحليل الاستراتيجي</p>
-              <h1 className="text-3xl font-black leading-tight md:text-5xl">
-                ذكاء المدرسة
-                <span className="mt-2 block text-cyan-300">من البيانات إلى القرار</span>
-              </h1>
-              <p className="mt-6 max-w-2xl text-sm leading-8 text-blue-100">
-                منظومة تحليل متقدمة تجمع المؤشرات التعليمية والإدارية والمالية
-                في مركز واحد، لتمنح إدارة مدرسة الرواد الحديثة رؤية شاملة
-                حول الأداء الحالي، ومقارنة النتائج، واكتشاف نقاط القوة
-                وفرص التحسين.
-              </p>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <button
-                  onClick={() => window.print()}
-                  className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-[#102344] transition hover:bg-cyan-50"
-                >
-                  <Download size={18} />
-                  طباعة التقرير
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab("overview");
-                    setPeriod("12");
-                  }}
-                  className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 font-bold text-white hover:bg-white/20"
-                >
-                  <RefreshCw size={17} />
-                  تحديث العرض
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "مؤشر الأداء العام", value: "92.8%", icon: Gauge },
-                { label: "معدل النمو", value: "+14.8%", icon: TrendingUp },
-                { label: "جودة التعليم", value: "94/100", icon: Award },
-                { label: "كفاءة التشغيل", value: "91.5%", icon: Zap },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur">
-                    <Icon size={22} className="text-cyan-300" />
-                    <p className="mt-4 text-xs text-blue-200">{item.label}</p>
-                    <h3 className="mt-2 text-2xl font-black">{item.value}</h3>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5 text-xs text-blue-200">
-            <span className="flex items-center gap-2"><CalendarDays size={15} /> العام الدراسي 2026 / 2027</span>
-            <span className="flex items-center gap-2"><ShieldCheck size={15} /> لوحة الإدارة العليا</span>
-            <span className="flex items-center gap-2"><Activity size={15} /> التحليلات والمؤشرات المؤسسية</span>
-          </div>
-        </div>
-      </header> */}
       {/* ================= FOOTER ================= */}
 
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 py-6 text-xs text-slate-400">
