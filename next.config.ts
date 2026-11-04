@@ -1,8 +1,7 @@
-import type { NextConfig } from "next";
-
+/** @type {import('next').NextConfig} */
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   output: "export",
 
   ...(isGitHubPages && {
@@ -15,15 +14,8 @@ const nextConfig: NextConfig = {
   },
 
   trailingSlash: true,
-
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
-  },
+  
+  // تم إزالة turbopack rules اليدوية لأنها قد تتعارض مع Tailwind v4 وتحجب ملفات الـ CSS
 };
 
 export default nextConfig;
