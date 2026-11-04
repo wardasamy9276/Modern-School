@@ -3,14 +3,27 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../../context/LanguageContext";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-// مسار استيراد Supabase (يمكنك تعديله حسب المسار الفعلي لديكِ)
-import { supabase } from "../../lib/supabase";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+
+import { auth } from "../../lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
   const { t: rawT, language } = useLanguage();
+
   const t = rawT as Record<string, string>;
   const isRtl = language === "ar";
 
@@ -22,7 +35,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
-  // دالة تسجيل الدخول
+  // Firebase Error Messages (محدثة لتشمل أخطاء فايربيس الجديدة)
+  const getFirebaseError = (errorCode: string) => {
+    const errors: Record<string, string> = {
+      "auth/invalid-email": "البريد الإلكتروني غير صحيح.",
+      "auth/user-not-found": "لا يوجد حساب مسجل بهذا البريد الإلكتروني.",
+      "auth/wrong-password": "كلمة المرور غير صحيحة.",
+      "auth/invalid-credential": "بيانات الدخول غير صحيحة، يرجى التأكد من البريد أو إعادة تعيين كلمة المرور.",
+      "auth/user-disabled": "هذا الحساب تم تعطيله.",
+      "auth/too-many-requests": "محاولات كثيرة، حاولي مرة أخرى بعد قليل.",
+      "auth/network-request-failed": "تعذر الاتصال بالإنترنت، تحققي من اتصالك.",
+      "auth/operation-not-allowed": "تسجيل الدخول بالبريد الإلكتروني غير مفعل في فايربيس.",
+    };
+
+    // إذا كان الخطأ غير مضاف، سيظهر لنا كود الخطأ الحقيقي لنتمكن من معرفته فورا
+    return errors[errorCode] || `خطأ من فايربيس (${errorCode || "unknown"})`;
+  };
+
+  // Login
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -41,50 +71,46 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password,
-      });
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      router.replace("/dashboard");
+      router.refresh();
+    } catch (err: unknown) {
+      console.error("Firebase Login Error:", err);
+      
+      const errorCode =
+        typeof err === "object" && err !== null && "code" in err
+          ? String(err.code)
+          : "";
 
-      if (loginError) {
-        setError("بيانات الدخول غير صحيحة، يرجى التأكد من البريد وكلمة المرور.");
-        setLoading(false);
-        return;
-      }
-
-      router.push("/dashboard");
-    } catch (err) {
-      setError("حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.");
+      setError(getFirebaseError(errorCode));
     } finally {
       setLoading(false);
     }
   };
 
-  // دالة إرسال رابط استعادة كلمة المرور عند النسيان
+  // Forgot Password
   const handleForgotPassword = async () => {
     setError("");
     setMessage("");
 
     if (!email.trim()) {
-      setError("من فضلك أدخل بريدك الإلكتروني في الحقل بالأعلى أولاً لطلب استعادة كلمة المرور.");
+      setError("من فضلك أدخل بريدك الإلكتروني أولاً.");
       return;
     }
 
     setResetLoading(true);
 
     try {
-      // إرسال رابط الاستعادة إلى البريد المدخل
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/login`, // يمكنك توجيهه لصفحة تحديث كلمة المرور إذا أردتِ
-      });
-
-      if (resetError) {
-        setError("فشل إرسال بريد الاستعادة، تأكد من صحة البريد الإلكتروني.");
-      } else {
-        setMessage("تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني بنجاح. يرجى تفقد صندوق الوارد.");
-      }
-    } catch (err) {
-      setError("حدث خطأ أثناء محاولة إرسال رابط الاستعادة.");
+      await sendPasswordResetEmail(auth, email.trim());
+      setMessage("تم إرسال رابط استعادة كلمة المرور. يرجى مراجعة بريدك الإلكتروني.");
+    } catch (err: unknown) {
+      console.error("Firebase Reset Error:", err);
+      
+      const errorCode =
+        typeof err === "object" && err !== null && "code" in err
+          ? String(err.code)
+          : "";
+      setError(getFirebaseError(errorCode));
     } finally {
       setResetLoading(false);
     }
@@ -93,75 +119,65 @@ export default function LoginPage() {
   return (
     <main
       dir={isRtl ? "rtl" : "ltr"}
-      className="min-h-screen bg-gradient-to-br 
-      from-cyan-50 via-white to-slate-100 flex 
-      flex-col items-center justify-center px-4 py-10"
+      className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br from-cyan-50 via-white to-slate-100"
     >
       <div className="w-full max-w-md">
-
-        {/* العنوان */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-extrabold text-slate-900">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#067492] flex items-center justify-center shadow-lg shadow-cyan-900/20">
+            <Lock className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             {t.loginTitle || "تسجيل الدخول"}
           </h1>
-
-          <p className="text-sm text-slate-500 mt-2">
-            {t.loginSubtitle || "مرحباً بك مجدداً، أدخل بياناتك للوصول للوحة التحكم"}
+          <p className="text-sm text-slate-500 mt-3 leading-7">
+            {t.loginSubtitle || "مرحباً بك مجدداً، أدخل بياناتك للوصول إلى لوحة التحكم"}
           </p>
         </div>
 
-        {/* نموذج تسجيل الدخول */}
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8">
-
-          {/* رسالة الخطأ */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 p-6 sm:p-8">
           {error && (
-            <div className="mb-5 rounded-xl bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-sm text-center">
+            <div role="alert" className="mb-5 rounded-xl bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-sm text-center leading-6 break-words">
               {error}
             </div>
           )}
 
-          {/* رسالة النجاح (عند إرسال رابط الاستعادة) */}
           {message && (
-            <div className="mb-5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 text-sm text-center">
+            <div role="status" className="mb-5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3 text-sm text-center leading-6">
               {message}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
-
-            {/* البريد الإلكتروني */}
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="login-email" className="block text-sm font-bold text-slate-700 mb-2">
                 {t.emailLabel || "البريد الإلكتروني"}
               </label>
-
               <div className="relative">
                 <input
+                  id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@email.com"
                   autoComplete="email"
                   required
-                  className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50 px-4 ps-11 text-sm outline-none focus:border-[#067492] focus:bg-white focus:ring-2 focus:ring-cyan-100 text-slate-800"
+                  disabled={loading}
+                  className="w-full h-13 rounded-xl border border-slate-200 bg-slate-50 px-4 ps-12 text-sm text-slate-800 outline-none transition-all focus:border-[#067492] focus:bg-white focus:ring-4 focus:ring-cyan-100 disabled:opacity-60"
                 />
                 <Mail className="w-5 h-5 absolute top-1/2 -translate-y-1/2 start-4 text-slate-400" />
               </div>
             </div>
 
-            {/* كلمة المرور */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-slate-700">
+                <label htmlFor="login-password" className="text-sm font-bold text-slate-700">
                   {t.passwordLabel || "كلمة المرور"}
                 </label>
-                
-                {/* زر نسيت كلمة المرور */}
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  disabled={resetLoading}
-                  className="text-xs font-medium text-[#067492] hover:underline cursor-pointer disabled:opacity-50"
+                  disabled={resetLoading || loading}
+                  className="text-xs font-semibold text-[#067492] hover:text-[#055d75] hover:underline disabled:opacity-50"
                 >
                   {resetLoading ? "جاري الإرسال..." : "نسيت كلمة المرور؟"}
                 </button>
@@ -169,47 +185,49 @@ export default function LoginPage() {
 
               <div className="relative">
                 <input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="أدخل كلمة المرور"
                   autoComplete="current-password"
                   required
-                  className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50 px-4 pe-12 ps-11 text-sm outline-none focus:border-[#067492] focus:bg-white focus:ring-2 focus:ring-cyan-100 text-slate-800"
+                  disabled={loading}
+                  className="w-full h-13 rounded-xl border border-slate-200 bg-slate-50 px-4 ps-12 pe-12 text-sm text-slate-800 outline-none transition-all focus:border-[#067492] focus:bg-white focus:ring-4 focus:ring-cyan-100 disabled:opacity-60"
                 />
                 <Lock className="w-5 h-5 absolute top-1/2 -translate-y-1/2 start-4 text-slate-400" />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute top-1/2 -translate-y-1/2 end-4 text-slate-500 hover:text-[#067492]"
                   aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* زر تسجيل الدخول */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-xl bg-[#067492] hover:bg-[#055d75] flex items-center justify-center text-white font-bold transition cursor-pointer disabled:opacity-50"
+              className="w-full h-13 rounded-xl bg-[#067492] hover:bg-[#055d75] flex items-center justify-center gap-3 text-white font-bold shadow-lg shadow-cyan-900/15 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "جاري تسجيل الدخول..." : (t.loginBtn || "تسجيل الدخول")}
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  جاري تسجيل الدخول...
+                </>
+              ) : (
+                t.loginBtn || "تسجيل الدخول"
+              )}
             </button>
-
           </form>
+
+          <div className="mt-7 pt-5 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-400">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            {t.secureDataNotice || "جميع بياناتك محمية وآمنة"}
+          </div>
         </div>
-
-        <p className="text-center text-xs text-slate-400 mt-6">
-          {t.secureDataNotice || "جميع بياناتك محمية وآمنة"}
-        </p>
-
       </div>
     </main>
   );

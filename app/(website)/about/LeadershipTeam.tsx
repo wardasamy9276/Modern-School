@@ -10,7 +10,7 @@ export default function LeadershipTeam() {
 
   const content = {
     ar: {
-      tag: "منظومة Smart Schools Complex الشاملة",
+      tag: "منظومة Al Rowad Modern School  Complex الشاملة",
       title: "إدارة متكاملة ومنصة تعليمية متطورة لإدارة المدارس (ERP & LMS)",
       description:
         "نقدم حلولاً برمجية متكاملة تدمج لوحة التحكم الإدارية الكاملة، منصة التعلم الذكي LMS، ونظام تخطيط موارد المؤسسات ERP لإدارة المدارس الخاصة والدولية بكل احترافية.",
@@ -64,13 +64,13 @@ export default function LeadershipTeam() {
           icon: "👪",
         },
       ],
-      ctaTitle: "ابدأ التطور الرقمي اليوم مع منظومة Smart Schools Complex",
+      ctaTitle: "ابدأ التطور الرقمي اليوم مع منظومة Al Rowad Modern School  Complex",
       ctaDesc:
         "تعرف على المزيد حول نظام تخطيط موارد المؤسسات المدرسية Pioneers E-School ERP وانقل مدرستك إلى المستقبل الرقمي بكل ثقة واحترافية.",
       ctaButton: "تواصل معنا وابدأ الآن",
     },
     en: {
-      tag: "Comprehensive Smart Schools Complex Ecosystem",
+      tag: "Comprehensive Al Rowad Modern School  Complex Ecosystem",
       title: "Integrated Management & Advanced LMS/ERP School System",
       description:
         "We provide comprehensive software solutions combining full administrative control panels, smart learning LMS platforms, and ERP systems for private and international schools.",
@@ -124,7 +124,7 @@ export default function LeadershipTeam() {
           icon: "👪",
         },
       ],
-      ctaTitle: "Start Your Digital Evolution Today with Smart Schools Complex",
+      ctaTitle: "Start Your Digital Evolution Today with Al Rowad Modern School  Complex",
       ctaDesc:
         "Discover more about Pioneers E-School ERP school resource planning system and take your school into the digital future with absolute confidence.",
       ctaButton: "Contact Us & Start Now",
@@ -220,7 +220,7 @@ export default function LeadershipTeam() {
                   {currentTab.icon}
                 </span>
                 <h4 className="text-xl md:text-2xl font-black mb-3">
-                  Smart Schools Complex LMS & ERP
+             Al Rowad Modern School  Complex LMS & ERP
                 </h4>
                 <p className="text-cyan-100 text-xs md:text-sm leading-relaxed opacity-90">
                   {currentTab.subtitle} - تم تصميم هذه المنظومة خصيصاً لتوفير

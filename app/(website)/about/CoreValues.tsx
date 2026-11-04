@@ -9,7 +9,7 @@ export default function CoreValues() {
   const translations = {
     ar: {
       tag: "رؤية مجمع سمارت التعليمي",
-      title: "المبادئ والركائز التي تقود Smart Schools Complex",
+      title: "المبادئ والركائز التي تقود Al Rowad Modern School  Complex",
       description:
         "في مجمع مدارس سمارت، نصيغ مستقبل التعليم من خلال دمج التكنولوجيا الحديثة بالقيم التربوية الأصيلة لتمكين الجيل القادم من قادة المستقبل في بيئة تفاعلية ومبتكرة.",
       values: [
@@ -56,10 +56,10 @@ export default function CoreValues() {
       ],
     },
     en: {
-      tag: "Smart Schools Complex Vision",
-      title: "Principles and Pillars Guiding Smart Schools Complex",
+      tag: "Al Rowad Modern School  Complex Vision",
+      title: "Principles and Pillars Guiding Al Rowad Modern School  Complex",
       description:
-        "At Smart Schools Complex, we reshape the future of education by integrating modern technology with traditional values to empower the next generation of leaders.",
+        " Al Rowad Modern School  Complex, we reshape the future of education by integrating modern technology with traditional values to empower the next generation of leaders.",
       values: [
         {
           title: "Digital Transformation",
@@ -98,7 +98,7 @@ export default function CoreValues() {
         },
         {
           title: "Professional Ethics",
-          desc: "Integrity, mutual respect, and absolute honesty are the steadfast foundational pillars upon which every Smart School student builds all personal and professional relations.",
+          desc: "Integrity, mutual respect, and absolute honesty are the steadfast foundational pillars upon which every Al Rowad Modern School  student builds all personal and professional relations.",
           badge: "Ethics",
         },
       ],

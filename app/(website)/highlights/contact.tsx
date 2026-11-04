@@ -27,7 +27,7 @@ export default function SmartContactHubPage() {
   const content = {
     ar: {
       tag: "Smart Star • تواصل معنا",
-      mainTitle: "قنوات الاتصال المباشر والدعم الفني لمجمع مدارس Smart School",
+      mainTitle: "قنوات الاتصال المباشر والدعم الفني لمجمع مدارس Al Rowad Modern School ",
       description:
         "نحن هنا لخدمتكم على مدار الساعة. اختر الطريقة الأنسب لك لتتواصل مع فريق الدعم الفني، المبيعات، أو الاستشارات الإدارية.",
       channels: [
@@ -43,7 +43,7 @@ export default function SmartContactHubPage() {
         },
         {
           title: "المقر الرئيسي للمجمعات",
-          detail: "القاهرة، التجمع الخامس - مصر (إدارة فروع Smart School)",
+          detail: "القاهرة، التجمع الخامس - مصر (إدارة فروع Al Rowad Modern School )",
           icon: <MapPin className="w-6 h-6 text-cyan-300" />,
         },
         {

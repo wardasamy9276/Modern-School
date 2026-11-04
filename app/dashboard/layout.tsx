@@ -30,14 +30,15 @@
 //   );
 
 
-
-
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import { useLanguage } from "../context/LanguageContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../lib/firebase";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -46,15 +47,45 @@ export default function DashboardLayout({
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const router = useRouter();
 
   const { language } = useLanguage();
   const isArabic = language === "ar";
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // حماية صارمة: السماح فقط لإيميلك الشخصي بالوصول للداش بورد
+        if (user.email === "wardasamy1996@gmail.com") {
+          setAuthorized(true);
+        } else {
+          router.replace("/login");
+        }
+      } else {
+        router.replace("/login");
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <Loader2 className="w-8 h-8 animate-spin text-[#067492]" />
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return null;
+  }
+
   return (
-    <div
-      dir={isArabic ? "rtl" : "ltr"}
-      className="min-h-screen bg-slate-100"
-    >
+    <div dir={isArabic ? "rtl" : "ltr"} className="min-h-screen bg-slate-100">
       <Sidebar
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
@@ -79,9 +110,7 @@ export default function DashboardLayout({
           }
         `}
       >
-        <main className="min-h-screen w-full">
-          {children}
-        </main>
+        <main className="min-h-screen w-full">{children}</main>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ const faqData = [
     },
     answer: {
       ar: "هو نظام إداري وتعليمي سحابي متكامل ومصمم خصيصاً لمجمع مدارس سمارت لإدارة المدارس الخاصة والدولية بكفاءة عالية واحترافية مطلقة. يربط النظام بين الإدارة، المعلمين، الطلاب، وأولياء الأمور في منصة رقمية واحدة تسهل متابعة شؤون الطلاب الأكاديمية، السلوكية، والإدارية لحظة بلحظة مع توفير تقارير دقيقة ومستمرة.",
-      en: "It is an integrated cloud-based administrative and educational system specially designed for Smart Schools Complex to manage private and international schools with high efficiency and absolute professionalism. The system connects administration, teachers, students, and parents into a single digital platform that facilitates tracking student academic, behavioral, and administrative affairs moment by moment while providing accurate and continuous reports.",
+      en: "It is an integrated cloud-based administrative and educational system specially designed for   Al Rowad Modern School  Complex to manage private and international schools with high efficiency and absolute professionalism. The system connects administration, teachers, students, and parents into a single digital platform that facilitates tracking student academic, behavioral, and administrative affairs moment by moment while providing accurate and continuous reports.",
     },
   },
   {
@@ -112,7 +112,7 @@ const faqData = [
     },
     answer: {
       ar: "نعم، يوفر مجمع سمارت فريق دعم فني وتقني متكامل ومتاح لمساعدة المستخدمين (من أولياء أمور ومعلمين وإداريين) على مدار الساعة لحل أي استفسارات أو مشاكل تقنية وضمان استمرارية العملية التعليمية بسلاسة.",
-      en: "Yes, Smart Schools Complex provides a fully integrated technical support team available around the clock to assist users (parents, teachers, and administrators) in resolving any inquiries or technical issues and ensuring the smooth continuity of the educational process.",
+      en: "Yes, Al Rowad Modern School  Complex provides a fully integrated technical support team available around the clock to assist users (parents, teachers, and administrators) in resolving any inquiries or technical issues and ensuring the smooth continuity of the educational process.",
     },
   },
 ];

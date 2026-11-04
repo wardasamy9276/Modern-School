@@ -12,8 +12,8 @@ export default function SmartSchoolCommandConsole() {
 
   const content = {
     ar: {
-      tag: "Smart School • وحدة التحكم البرمجية",
-      mainTitle: "محطة العمليات المركزية لمجمع مدارس Smart School",
+      tag: "Al Rowad Modern School  • وحدة التحكم البرمجية",
+      mainTitle: "محطة العمليات المركزية لمجمع مدارس Al Rowad Modern School ",
       description:
         "واجهة تشغيل تفاعلية متقدمة ومستقلة تماماً، مصممة لعرض تدفق البيانات الإدارية والأكاديمية عبر مسارات رقمية متصلة بلا حدود.",
       tabs: [
@@ -39,8 +39,8 @@ export default function SmartSchoolCommandConsole() {
       ctaBtn: "تفعيل النظام بالكامل",
     },
     en: {
-      tag: "Smart School • Software Control Unit",
-      mainTitle: "Central Operations Terminal for Smart School Complex",
+      tag: "Al Rowad Modern School  • Software Control Unit",
+      mainTitle: "Central Operations Terminal for Al Rowad Modern School  Complex",
       description:
         "An advanced, fully independent interactive operating interface designed to display administrative and academic data flow through boundless connected digital pathways.",
       tabs: [
@@ -48,7 +48,7 @@ export default function SmartSchoolCommandConsole() {
           id: "01",
           title: "Instant Branch Synchronization",
           subtitle: "Live digital linking for 12 educational branches",
-          text: "Data, attendance records, and administrative reports for all Smart School branches are synchronized instantly via the cloud, ensuring administrative decisions are made in milliseconds.",
+          text: "Data, attendance records, and administrative reports for all Al Rowad Modern School  branches are synchronized instantly via the cloud, ensuring administrative decisions are made in milliseconds.",
         },
         {
           id: "02",
@@ -139,7 +139,7 @@ export default function SmartSchoolCommandConsole() {
         {/* الشريط السفلي */}
         <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <span className="text-xs font-mono uppercase tracking-widest text-cyan-200/70">
-            SMART SCHOOL ENGINE • PROTOCOL 2026
+           Al Rowad Modern School  ENGINE • PROTOCOL 2026
           </span>
 
           <Link href="/demo">

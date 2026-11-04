@@ -457,7 +457,7 @@ export default function CampusFacilitiesGallery() {
       tag: "Smart Campus",
       title: "An Exceptional Environment Inspiring Passion for Learning",
       description:
-        "Taking you on an expressive visual tour inside Smart Schools Complex facilities equipped to the highest standards.",
+        "Taking you on an expressive visual tour inside Al Rowad Modern School  Complex facilities equipped to the highest standards.",
       slides: [
         {
           title: "Computer Lab & Artificial Intelligence",

@@ -77,7 +77,7 @@ export default function SmartSchoolsExtendedSections() {
       isRtl ? "مستقبل التعليم الرقمي" : "Future of Digital Education",
       isRtl
         ? "المنظومة الذكية لإدارة المدارس"
-        : "Smart School Management System",
+        : "Al Rowad Modern School  Management System",
     ],
     heroDesc: isRtl
       ? "نُقدم لك في مجمع مدارس Al Rowad Modern School  رؤية تقنية وتعليمية متكاملة ومتقدمة تدمج أحدث أنظمة إدارة التعلم الذكي (LMS) والحلول الإدارية الشاملة (ERP) في منصة رقمية واحدة فائقة الجودة."
@@ -348,7 +348,7 @@ Al Rowad Modern School
 
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0e7490]/30 text-cyan-300 text-xs font-semibold mb-4 border border-[#0e7490]/50">
               <Sparkles size={14} />
-              <span>Smart Schools Ecosystem Details</span>
+              <span>Al Rowad Modern School </span>
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black mb-4 tracking-tight">

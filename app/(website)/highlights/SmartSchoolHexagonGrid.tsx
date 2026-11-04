@@ -46,7 +46,7 @@
 //       successNotice: "تم إرسال إشعارك بنجاح إلى النظام المركزي، جاري التوجيه للرد.",
 //     },
 //     en: {
-//       tag: "Smart School • Strategic Communication Console",
+//       tag: " • Strategic Communication Console",
 //       mainTitle: "Central Communication Channels & Educational Integration",
 //       description: "Choose the appropriate communication pathway for your educational complex, and our expert team will follow up instantly.",
 //       channels: [
@@ -251,7 +251,7 @@ export default function SmartSchoolInteractiveConsole() {
 
   const content = {
     ar: {
-      tag: "Smart School • محطة الاتصال الاستراتيجي",
+      tag: "Al Rowad Modern School  • محطة الاتصال الاستراتيجي",
       mainTitle: "قنوات التواصل المركزي وربط المؤسسات التعليمية",
       description:
         "اختر مسار الاتصال المناسب لاحتياجات صرحك التعليمي، وسيتولى فريق الخبراء لدينا المتابعة الفورية.",
@@ -287,7 +287,7 @@ export default function SmartSchoolInteractiveConsole() {
         "تم إرسال إشعارك بنجاح إلى النظام المركزي، جاري التوجيه للرد.",
     },
     en: {
-      tag: "Smart School • Strategic Communication Console",
+      tag: "Al Rowad Modern School  • Strategic Communication Console",
       mainTitle: "Central Communication Channels & Educational Integration",
       description:
         "Choose the appropriate communication pathway for your educational complex, and our expert team will follow up instantly.",

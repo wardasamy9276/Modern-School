@@ -572,15 +572,17 @@
 //   );
 // }
 
-
-
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "../../context/LanguageContext";
 import { X } from "lucide-react";
-import { schools, schoolDescriptions, School } from "./data/SchoolsPageData";
+import {
+  schools,
+  schoolDescriptions,
+  School,
+} from "./data/SchoolsPageData";
 
 export default function SchoolsPage() {
   const { language } = useLanguage();
@@ -591,10 +593,7 @@ export default function SchoolsPage() {
       dir={language === "ar" ? "rtl" : "ltr"}
       className="min-h-screen bg-gray-50 py-10 sm:py-16 px-4 sm:px-6"
     >
-      {/* ==================================================
-          العنوان
-      ================================================== */}
-
+      {/* العنوان */}
       <div className="text-center mb-10 sm:mb-14">
         <h1 className="text-2xl sm:text-4xl font-bold text-[#9E7C2F]">
           {language === "ar"
@@ -609,19 +608,17 @@ export default function SchoolsPage() {
         </p>
       </div>
 
-      {/* ==================================================
-          كروت المدارس
-      ================================================== */}
-
+      {/* كروت المدارس */}
       <div
         className="
           max-w-7xl
           mx-auto
           grid
           grid-cols-1
-          sm:grid-cols-2
+          min-[400px]:grid-cols-2
           md:grid-cols-3
-          lg:grid-cols-5
+          lg:grid-cols-4
+          xl:grid-cols-5
           gap-4
           sm:gap-6
         "
@@ -645,23 +642,25 @@ export default function SchoolsPage() {
               duration-300
             "
           >
-            {/* صورة + اسم المدرسة فقط */}
-
+            {/* صورة المدرسة واسمها */}
             <div className="w-full">
               {/* صورة المدرسة */}
-
-              <div className="relative  sm:h-32 mb-4 flex items-center justify-center">
+              <div className="relative w-full h-36 sm:h-32 md:h-40 mb-4 flex items-center justify-center">
                 <Image
-                  src={`/${school.logo.replaceAll("\\", "/")}`}
-                  alt={language === "ar" ? school.name_ar : school.name_en}
+                  src={`/${school.logo.replaceAll("\\", "/").replace(/^\/+/, "")}`}
+                  alt={
+                    language === "ar"
+                      ? school.name_ar
+                      : school.name_en
+                  }
                   fill
+                  sizes="(max-width: 400px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
                   className="object-contain"
                   unoptimized
                 />
               </div>
 
               {/* اسم المدرسة */}
-
               <h2
                 className="
                   font-bold
@@ -675,14 +674,13 @@ export default function SchoolsPage() {
                   min-h-[40px]
                 "
               >
-                {language === "ar" ? school.name_ar : school.name_en}
+                {language === "ar"
+                  ? school.name_ar
+                  : school.name_en}
               </h2>
             </div>
 
-            {/* ==================================================
-                زر معرفة المزيد
-            ================================================== */}
-
+            {/* زر التفاصيل */}
             <button
               type="button"
               onClick={() => setSelectedSchool(school)}
@@ -701,16 +699,15 @@ export default function SchoolsPage() {
                 transition-all
               "
             >
-              {language === "ar" ? "تفاصيل المدرسة" : "Learn More"}
+              {language === "ar"
+                ? "تفاصيل المدرسة"
+                : "Learn More"}
             </button>
           </div>
         ))}
       </div>
 
-      {/* ==================================================
-          الكارت الكبير عند الضغط على معرفة المزيد
-      ================================================== */}
-
+      {/* نافذة تفاصيل المدرسة */}
       {selectedSchool && (
         <div
           className="
@@ -737,15 +734,12 @@ export default function SchoolsPage() {
               bg-white
               rounded-3xl
               shadow-2xl
-              p-6
+              p-5
               sm:p-8
             "
             onClick={(e) => e.stopPropagation()}
           >
-            {/* ==================================================
-                زر الإغلاق X
-            ================================================== */}
-
+            {/* زر الإغلاق */}
             <button
               type="button"
               onClick={() => setSelectedSchool(null)}
@@ -772,30 +766,25 @@ export default function SchoolsPage() {
               <X size={22} />
             </button>
 
-            {/* ==================================================
-                لوجو المدرسة
-            ================================================== */}
-
+            {/* لوجو المدرسة */}
             <div className="flex justify-center mb-5">
-              <div className="relative  sm:w-28 sm:h-28">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28">
                 <Image
-                  src={`/${selectedSchool.logo.replaceAll("\\", "/")}`}
+                  src={`/${selectedSchool.logo.replaceAll("\\", "/").replace(/^\/+/, "")}`}
                   alt={
                     language === "ar"
                       ? selectedSchool.name_ar
                       : selectedSchool.name_en
                   }
                   fill
+                  sizes="112px"
                   className="object-contain"
                   unoptimized
                 />
               </div>
             </div>
 
-            {/* ==================================================
-                اسم المدرسة
-            ================================================== */}
-
+            {/* اسم المدرسة */}
             <div className="text-center mb-7">
               <h2 className="text-2xl sm:text-3xl font-bold text-cyan-800">
                 {language === "ar"
@@ -806,10 +795,7 @@ export default function SchoolsPage() {
               <div className="w-16 h-1 bg-cyan-700 rounded-full mx-auto mt-3" />
             </div>
 
-            {/* ==================================================
-                الوصف — يظهر هنا فقط عند فتح الكارت
-            ================================================== */}
-
+            {/* وصف المدرسة */}
             <div
               className="
                 mb-7
@@ -831,7 +817,9 @@ export default function SchoolsPage() {
                   text-center
                 "
               >
-                {language === "ar" ? "نبذة عن المدرسة" : "About the School"}
+                {language === "ar"
+                  ? "نبذة عن المدرسة"
+                  : "About the School"}
               </h3>
 
               <p
@@ -855,13 +843,9 @@ export default function SchoolsPage() {
               </p>
             </div>
 
-            {/* ==================================================
-                بيانات المدرسة
-            ================================================== */}
-
+            {/* بيانات المدرسة */}
             <div className="space-y-4">
               {/* الاسم العربي */}
-
               <div
                 className="
                   bg-gray-50
@@ -872,7 +856,9 @@ export default function SchoolsPage() {
                 "
               >
                 <p className="text-sm text-gray-500 mb-1">
-                  {language === "ar" ? "اسم المدرسة بالعربي" : "Arabic Name"}
+                  {language === "ar"
+                    ? "اسم المدرسة بالعربي"
+                    : "Arabic Name"}
                 </p>
 
                 <p className="font-bold text-gray-800 text-base">
@@ -881,7 +867,6 @@ export default function SchoolsPage() {
               </div>
 
               {/* الاسم الإنجليزي */}
-
               <div
                 className="
                   bg-gray-50
@@ -903,7 +888,6 @@ export default function SchoolsPage() {
               </div>
 
               {/* الحالة */}
-
               <div
                 className="
                   bg-gray-50
@@ -914,12 +898,16 @@ export default function SchoolsPage() {
                 "
               >
                 <p className="text-sm text-gray-500 mb-1">
-                  {language === "ar" ? "حالة المدرسة" : "School Status"}
+                  {language === "ar"
+                    ? "حالة المدرسة"
+                    : "School Status"}
                 </p>
 
                 <p
                   className={`font-bold ${
-                    selectedSchool.status ? "text-green-600" : "text-red-600"
+                    selectedSchool.status
+                      ? "text-green-600"
+                      : "text-red-600"
                   }`}
                 >
                   {selectedSchool.status
@@ -933,7 +921,6 @@ export default function SchoolsPage() {
               </div>
 
               {/* الترتيب */}
-
               <div
                 className="
                   bg-gray-50
@@ -944,7 +931,9 @@ export default function SchoolsPage() {
                 "
               >
                 <p className="text-sm text-gray-500 mb-1">
-                  {language === "ar" ? "ترتيب المدرسة" : "School Order"}
+                  {language === "ar"
+                    ? "ترتيب المدرسة"
+                    : "School Order"}
                 </p>
 
                 <p className="font-bold text-gray-800">
@@ -953,10 +942,7 @@ export default function SchoolsPage() {
               </div>
             </div>
 
-            {/* ==================================================
-                زر الإغلاق
-            ================================================== */}
-
+            {/* زر الإغلاق */}
             <button
               type="button"
               onClick={() => setSelectedSchool(null)}

@@ -25,9 +25,9 @@ export default function Navbar() {
 
   const whatsappNumber = "+201040381899";
   const whatsappMessage = encodeURIComponent(
-    "مرحباً، أرغب الاستفسار عن منظومة Smart Star لـ Smart School",
+    "مرحباً، أرغب الاستفسار عن منظومة Al Rowad Modern School  لـ Al Rowad Modern School ",
   );
-  const phoneNumber = "+20219888";
+  const phoneNumber = "+201040381899";
 
   const navData = [
     { id: 1, label: t.home, to: "/" },
@@ -85,7 +85,7 @@ export default function Navbar() {
       )}
 
       {/* 2. محتوى الـ Navbar */}
-      <nav className="bg-cyan-800 text-white shadow-md">
+      {/* <nav className="bg-cyan-800 text-white shadow-md">
         <div className="container mx-auto px-4 md:px-10 py-2">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -200,7 +200,124 @@ export default function Navbar() {
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
+      <nav className="bg-cyan-800 text-white shadow-md">
+  <div className="container mx-auto px-3 md:px-10 py-2">
+    <div className="flex items-center justify-between gap-3">
+
+      {/* Logo - يظهر في جميع الشاشات */}
+      <Link
+        href="/"
+        className="flex items-center shrink-0"
+        aria-label="Home"
+      >
+        <Image
+          src="/assets/image.png"
+          alt={t.logoAlt}
+          width={80}
+          height={80}
+          priority
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain block"
+        />
+      </Link>
+
+      {/* Desktop Navigation */}
+      <ul className="hidden md:flex items-center gap-6 font-medium">
+        {navData.map((item) => {
+          const isActive = pathname === item.to;
+
+          return (
+            <li key={item.id}>
+              <Link
+                href={item.to}
+                className={`relative pb-1 transition-colors ${
+                  isActive
+                    ? "text-cyan-200 font-bold"
+                    : "hover:text-cyan-200"
+                }`}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Desktop Actions */}
+      <div className="hidden md:flex items-center gap-4 shrink-0">
+        <button
+          onClick={toggleLanguage}
+          className="px-3 py-1.5 text-xs font-semibold border border-white/40 rounded-lg"
+        >
+          {language === "ar" ? "English 🌐" : "عربي 🌐"}
+        </button>
+
+        <Link
+          href="/register"
+          className="px-5 py-2 text-sm font-medium bg-white text-cyan-800 rounded-lg"
+        >
+          {t.login}
+        </Link>
+      </div>
+
+      {/* Mobile Actions */}
+      <div className="flex md:hidden items-center gap-3 shrink-0">
+        <button
+          onClick={toggleLanguage}
+          className="px-2 py-1 text-xs border border-white/40 rounded"
+        >
+          {language === "ar" ? "EN" : "عربي"}
+        </button>
+
+        <button
+          onClick={() => setOpen((prev) => !prev)}
+          className="text-2xl p-1"
+          aria-label={open ? t.closeMenu : t.openMenu}
+          aria-expanded={open}
+          type="button"
+        >
+          {open ? "✕" : "☰"}
+        </button>
+      </div>
+
+    </div>
+
+    {/* Mobile Menu */}
+    <div
+      className={`md:hidden transition-all duration-300 overflow-hidden ${
+        open ? "max-h-[400px] mt-4 opacity-100" : "max-h-0 opacity-0"
+      }`}
+    >
+      <ul className="flex flex-col gap-2 bg-white text-gray-800 p-4 rounded-lg shadow-lg">
+        {navData.map((item) => (
+          <li key={item.id} className="text-center">
+            <Link
+              href={item.to}
+              onClick={() => setOpen(false)}
+              className={`block py-2.5 px-4 rounded-md font-medium ${
+                pathname === item.to
+                  ? "bg-cyan-100 text-cyan-800 font-bold"
+                  : "hover:bg-cyan-50 hover:text-cyan-700"
+              }`}
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+
+        <hr className="my-2 border-gray-200" />
+
+        <Link
+          href="/register"
+          onClick={() => setOpen(false)}
+          className="w-full py-2.5 text-center rounded-md bg-cyan-800 text-white font-medium"
+        >
+          {t.login}
+        </Link>
+      </ul>
+    </div>
+  </div>
+</nav>
 
       {/* 3. عناصر التواصل الثابتة أسفل الشاشة */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-center justify-center">

@@ -14,7 +14,7 @@ export default function VideoGallery() {
       descAr:
         "شاهد كيف ندير مغامرات المدرسة الذكية ونتابع نجاح الأبطال يوماً بيوم بكل سهولة وبساطة.",
       descEn:
-        "Watch how we manage smart school adventures and track heroes' success day by day.",
+        "Watch how we manage Al Rowad Modern School  adventures and track heroes' success day by day.",
       src: "/assets/imge/IMG_0355warda.mp4",
     },
     {
