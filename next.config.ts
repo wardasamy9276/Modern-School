@@ -1,29 +1,11 @@
-
 import type { NextConfig } from "next";
 
-const isGitHubPages = process.env.GITHUB_PAGES === "true";
-
 const nextConfig: NextConfig = {
-  output: "export",
-
-  ...(isGitHubPages && {
-    basePath: "/Modern-School",
-    assetPrefix: "/Modern-School/",
-  }),
-
+  output: "export", // ضروري لإنشاء ملفات Static لـ GitHub Pages
+  basePath: "/rowad-modern-school", // ضع هنا اسم مستودع الجيت هاب الخاص بك بالضبط
+  assetPrefix: "/rowad-modern-school/",
   images: {
-    unoptimized: true,
-  },
-
-  trailingSlash: true,
-
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
+    unoptimized: true, // ضروري لأن GitHub Pages لا يدعم Next.js Image Optimization الديناميكي
   },
 };
 
