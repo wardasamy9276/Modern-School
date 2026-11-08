@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import StatsGrid from "./homepage/StatsGrid";
 import Analytics from "../dashboard/analytics/analytics"
 import DashboardHome from "../dashboard/DashboardHome"
+import DashboardView from "../dashboard/DashboardView"
 export default function DashboardPage() {
   // ================= SCHOOLS =================
   const [totalSchools, setTotalSchools] = useState(0);
@@ -80,8 +81,10 @@ export default function DashboardPage() {
         {/* ================= DASHBOARD OVERVIEW ================= */}
              <DashboardHome/>
         <DashboardOverview />
+        <DashboardView />
     
            <Analytics />
+
       </main>
     </div>
   );
