@@ -1248,7 +1248,11 @@
 //       )}
 //     </div>
 //   );
-// }
+
+
+
+
+
 
 "use client";
 
@@ -1283,13 +1287,11 @@ type SchoolType = {
   name: string;
   name_ar: string;
   name_en: string;
-  name_it: string;
   email: string;
   phone: string;
   address: string;
   address_ar: string;
   address_en: string;
-  address_it: string;
   image: string | null;
 };
 
@@ -1306,7 +1308,7 @@ type DraftType = FormType & {
   id: number;
 };
 
-type LanguageType = "ar" | "en" | "it";
+type LanguageType = "ar" | "en";
 
 const STORAGE_KEY = "staticSchools";
 const HIDDEN_KEY = "staticHiddenSchools";
@@ -1319,13 +1321,11 @@ const initialSchools: SchoolType[] = [
     name: "Al Rowad Modern School",
     name_ar: "مدرسة الرواد الحديثة",
     name_en: "Al Rowad Modern School",
-    name_it: "Scuola Moderna Al Rowad",
     email: "info@rowad-school.com",
     phone: "01000000000",
     address: "6 October, Giza",
     address_ar: "السادس من أكتوبر، الجيزة",
     address_en: "6 October, Giza",
-    address_it: "6 Ottobre, Giza",
     image: null,
   },
   {
@@ -1333,13 +1333,11 @@ const initialSchools: SchoolType[] = [
     name: "Al Rowad Language School",
     name_ar: "مدرسة الرواد للغات",
     name_en: "Al Rowad Language School",
-    name_it: "Scuola di Lingue Al Rowad",
     email: "languages@rowad-school.com",
     phone: "01100000000",
     address: "Sheikh Zayed, Giza",
     address_ar: "الشيخ زايد، الجيزة",
     address_en: "Sheikh Zayed, Giza",
-    address_it: "Sheikh Zayed, Giza",
     image: null,
   },
   {
@@ -1347,13 +1345,11 @@ const initialSchools: SchoolType[] = [
     name: "Future Generation School",
     name_ar: "مدرسة جيل المستقبل",
     name_en: "Future Generation School",
-    name_it: "Scuola Generazione Futura",
     email: "future@rowad-school.com",
     phone: "01200000000",
     address: "October Gardens, Giza",
     address_ar: "حدائق أكتوبر، الجيزة",
     address_en: "October Gardens, Giza",
-    address_it: "Giardini di Ottobre, Giza",
     image: null,
   },
 ];
@@ -1402,7 +1398,7 @@ export default function SchoolsPage() {
   const { language } = useLanguage();
 
   const currentLanguage: LanguageType =
-    language === "ar" || language === "it" ? language : "en";
+    language === "ar" ? "ar" : "en";
 
   const [schools, setSchools] = useState<SchoolType[]>(initialSchools);
   const [hiddenSchools, setHiddenSchools] = useState<number[]>([]);
@@ -1498,42 +1494,6 @@ export default function SchoolsPage() {
       close: "Close",
       emptyHint: "Start by adding your first school",
     },
-
-    it: {
-      title: "Le Nostre Scuole",
-      subtitle: "Scopri le scuole del sistema Al Rowad",
-      add: "Aggiungi Scuola",
-      search: "Cerca scuole...",
-      total: "Totale Scuole",
-      active: "Scuole Attive",
-      hidden: "Scuole Nascoste",
-      name: "Nome della Scuola",
-      email: "Indirizzo Email",
-      phone: "Numero di Telefono",
-      address: "Indirizzo",
-      image: "Immagine della Scuola",
-      save: "Salva Modifiche",
-      cancel: "Annulla",
-      edit: "Modifica",
-      hide: "Nascondi",
-      restore: "Ripristina",
-      delete: "Elimina",
-      empty: "Nessuna scuola trovata",
-      noResults: "Nessun risultato trovato",
-      addSuccess: "Scuola aggiunta con successo",
-      editSuccess: "Scuola aggiornata con successo",
-      required: "Inserisci il nome della scuola",
-      loading: "Caricamento scuole...",
-      hiddenTitle: "Scuole Nascoste",
-      showActive: "Mostra Scuole Attive",
-      showHidden: "Mostra Scuole Nascoste",
-      confirmDelete: "Sei sicuro di voler eliminare questa scuola?",
-      draft: "Nuova Scuola",
-      chooseImage: "Scegli Immagine",
-      all: "Tutte le Scuole",
-      close: "Chiudi",
-      emptyHint: "Inizia aggiungendo la tua prima scuola",
-    },
   };
 
   const words = t[currentLanguage];
@@ -1546,7 +1506,25 @@ export default function SchoolsPage() {
       const savedHidden = localStorage.getItem(HIDDEN_KEY);
 
       if (savedSchools) {
-        setSchools(JSON.parse(savedSchools) as SchoolType[]);
+        const parsedSchools = JSON.parse(savedSchools) as SchoolType[];
+
+        // Remove old Italian fields from previously saved records.
+        const cleanedSchools = parsedSchools.map((school) => {
+          const legacySchool = school as SchoolType & {
+            name_it?: string;
+            address_it?: string;
+          };
+
+          const {
+            name_it,
+            address_it,
+            ...cleanSchool
+          } = legacySchool;
+
+          return cleanSchool;
+        });
+
+        setSchools(cleanedSchools);
       }
 
       if (savedHidden) {
@@ -1598,20 +1576,12 @@ export default function SchoolsPage() {
       return school.name_ar || school.name;
     }
 
-    if (currentLanguage === "it") {
-      return school.name_it || school.name_en || school.name;
-    }
-
     return school.name_en || school.name;
   };
 
   const getSchoolAddress = (school: SchoolType): string => {
     if (currentLanguage === "ar") {
       return school.address_ar || school.address;
-    }
-
-    if (currentLanguage === "it") {
-      return school.address_it || school.address_en || school.address;
     }
 
     return school.address_en || school.address;
@@ -1720,14 +1690,12 @@ export default function SchoolsPage() {
         id: Date.now(),
         name: draft.name,
         name_ar: currentLanguage === "ar" ? draft.name : "",
-        name_en: currentLanguage === "en" ? draft.name : draft.name,
-        name_it: currentLanguage === "it" ? draft.name : "",
+        name_en: currentLanguage === "en" ? draft.name : "",
         email: draft.email,
         phone: draft.phone,
         address: draft.address,
         address_ar: currentLanguage === "ar" ? draft.address : "",
-        address_en: draft.address,
-        address_it: currentLanguage === "it" ? draft.address : "",
+        address_en: currentLanguage === "en" ? draft.address : "",
         image: imageData,
       };
 
@@ -1809,9 +1777,6 @@ export default function SchoolsPage() {
           if (currentLanguage === "ar") {
             updated.name_ar = editData.name;
             updated.address_ar = editData.address;
-          } else if (currentLanguage === "it") {
-            updated.name_it = editData.name;
-            updated.address_it = editData.address;
           } else {
             updated.name_en = editData.name;
             updated.address_en = editData.address;
