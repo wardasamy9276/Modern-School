@@ -4,7 +4,7 @@ import DashboardOverview from "./homepage/DashboardOverview";
 import React, { useEffect, useState } from "react";
 import StatsGrid from "./homepage/StatsGrid";
 import Analytics from "../dashboard/analytics/analytics"
-
+import DashboardHome from "../dashboard/DashboardHome"
 export default function DashboardPage() {
   // ================= SCHOOLS =================
   const [totalSchools, setTotalSchools] = useState(0);
@@ -78,7 +78,9 @@ export default function DashboardPage() {
         />
 
         {/* ================= DASHBOARD OVERVIEW ================= */}
+             <DashboardHome/>
         <DashboardOverview />
+    
            <Analytics />
       </main>
     </div>

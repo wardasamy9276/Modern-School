@@ -1,6 +1,10 @@
+
 "use client";
 
+import SchoolCharts from "./SchoolCharts";
+import StudentsPage from "./StudentsPage"
 import { useMemo, useState } from "react";
+
 import {
   Search,
   Plus,
@@ -15,7 +19,6 @@ import {
 } from "lucide-react";
 
 import { useLanguage } from "../../context/LanguageContext";
-
 
 interface Student {
   id: number;
@@ -81,12 +84,6 @@ const initialStudents: Student[] = [
   },
 ];
 
-/*
-|--------------------------------------------------------------------------
-| Student Names Translation
-|--------------------------------------------------------------------------
-*/
-
 const studentNames: Record<string, string> = {
   "أحمد محمد علي": "Ahmed Mohamed Ali",
   "سارة أحمد محمود": "Sara Ahmed Mahmoud",
@@ -94,12 +91,6 @@ const studentNames: Record<string, string> = {
   "مريم علي حسن": "Mariam Ali Hassan",
   "يوسف إبراهيم": "Youssef Ibrahim",
 };
-
-/*
-|--------------------------------------------------------------------------
-| Classes Translation
-|--------------------------------------------------------------------------
-*/
 
 const classTranslations: Record<string, string> = {
   الكل: "All Classes",
@@ -111,16 +102,13 @@ const classTranslations: Record<string, string> = {
   "الصف السادس": "Sixth Grade",
 };
 
-export default function StudentsPage() {
+export default function StudentsManagement() {
   const { language } = useLanguage();
-
   const isArabic = language === "ar";
 
   const [students, setStudents] = useState<Student[]>(initialStudents);
-
   const [search, setSearch] = useState("");
   const [selectedClass, setSelectedClass] = useState("الكل");
-
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [newStudent, setNewStudent] = useState({
@@ -141,49 +129,25 @@ export default function StudentsPage() {
     "الصف السادس",
   ];
 
-  /*
-  |--------------------------------------------------------------------------
-  | Translation Helpers
-  |--------------------------------------------------------------------------
-  */
-
   const translateStudentName = (name: string) => {
-    if (isArabic) {
-      return name;
-    }
-
+    if (isArabic) return name;
     return studentNames[name] || name;
   };
 
   const translateClass = (className: string) => {
-    if (isArabic) {
-      return className;
-    }
-
+    if (isArabic) return className;
     return classTranslations[className] || className;
   };
 
   const translateGender = (gender: Student["gender"]) => {
-    if (isArabic) {
-      return gender;
-    }
-
+    if (isArabic) return gender;
     return gender === "ذكر" ? "Male" : "Female";
   };
 
   const translateStatus = (status: Student["status"]) => {
-    if (isArabic) {
-      return status;
-    }
-
+    if (isArabic) return status;
     return status === "نشط" ? "Active" : "Inactive";
   };
-
-  /*
-  |--------------------------------------------------------------------------
-  | Filter Students
-  |--------------------------------------------------------------------------
-  */
 
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
@@ -199,38 +163,25 @@ export default function StudentsPage() {
     });
   }, [students, search, selectedClass]);
 
-  /*
-  |--------------------------------------------------------------------------
-  | Statistics
-  |--------------------------------------------------------------------------
-  */
-
   const activeStudents = students.filter(
-    (student) => student.status === "نشط",
+    (student) => student.status === "نشط"
   ).length;
 
   const inactiveStudents = students.filter(
-    (student) => student.status === "غير نشط",
+    (student) => student.status === "غير نشط"
   ).length;
 
   const maleStudents = students.filter(
-    (student) => student.gender === "ذكر",
+    (student) => student.gender === "ذكر"
   ).length;
-
-  /*
-  |--------------------------------------------------------------------------
-  | Add Student
-  |--------------------------------------------------------------------------
-  */
 
   const handleAddStudent = () => {
     if (!newStudent.name.trim()) {
       alert(
         isArabic
           ? "من فضلك اكتب اسم الطالب"
-          : "Please enter the student's name",
+          : "Please enter the student's name"
       );
-
       return;
     }
 
@@ -263,17 +214,11 @@ export default function StudentsPage() {
     setShowAddModal(false);
   };
 
-  /*
-  |--------------------------------------------------------------------------
-  | Delete Student
-  |--------------------------------------------------------------------------
-  */
-
   const handleDeleteStudent = (id: number) => {
     const confirmed = window.confirm(
       isArabic
         ? "هل أنت متأكد من حذف هذا الطالب؟"
-        : "Are you sure you want to delete this student?",
+        : "Are you sure you want to delete this student?"
     );
 
     if (!confirmed) return;
@@ -315,7 +260,6 @@ export default function StudentsPage() {
             className="flex items-center justify-center gap-2 rounded-xl bg-[#0B192C] px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-[#142b48]"
           >
             <Plus className="h-5 w-5" />
-
             {isArabic ? "إضافة طالب" : "Add Student"}
           </button>
         </div>
@@ -323,76 +267,64 @@ export default function StudentsPage() {
 
       {/* Statistics */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {/* Total */}
         <div className="rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-500">
                 {isArabic ? "إجمالي الطلاب" : "Total Students"}
               </p>
-
               <h2 className="mt-2 text-3xl font-bold text-slate-800">
                 {students.length}
               </h2>
             </div>
-
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
               <Users className="h-6 w-6" />
             </div>
           </div>
         </div>
 
-        {/* Active */}
         <div className="rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-500">
                 {isArabic ? "الطلاب النشطون" : "Active Students"}
               </p>
-
               <h2 className="mt-2 text-3xl font-bold text-green-600">
                 {activeStudents}
               </h2>
             </div>
-
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600">
               <UserCheck className="h-6 w-6" />
             </div>
           </div>
         </div>
 
-        {/* Inactive */}
         <div className="rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-500">
                 {isArabic ? "غير النشطين" : "Inactive Students"}
               </p>
-
               <h2 className="mt-2 text-3xl font-bold text-red-600">
                 {inactiveStudents}
               </h2>
             </div>
-
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-600">
               <UserX className="h-6 w-6" />
             </div>
           </div>
         </div>
 
-        {/* Male */}
         <div className="rounded-2xl bg-white p-5 shadow-sm transition hover:shadow-md">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-500">
                 {isArabic ? "الطلاب الذكور" : "Male Students"}
               </p>
-
               <h2 className="mt-2 text-3xl font-bold text-purple-600">
                 {maleStudents}
               </h2>
             </div>
-
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
               <GraduationCap className="h-6 w-6" />
             </div>
@@ -403,7 +335,6 @@ export default function StudentsPage() {
       {/* Search + Filter */}
       <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          {/* Search */}
           <div className="relative flex-1">
             <Search
               className={`absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 ${
@@ -426,7 +357,6 @@ export default function StudentsPage() {
             />
           </div>
 
-          {/* Class Filter */}
           <div className="w-full lg:w-56">
             <select
               value={selectedClass}
@@ -451,7 +381,6 @@ export default function StudentsPage() {
               <h2 className="text-xl font-bold text-slate-800">
                 {isArabic ? "قائمة الطلاب" : "Students List"}
               </h2>
-
               <p className="mt-1 text-sm text-slate-500">
                 {isArabic ? "عدد النتائج: " : "Results: "}
                 {filteredStudents.length}
@@ -472,27 +401,21 @@ export default function StudentsPage() {
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "الطالب" : "Student"}
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "الكود" : "Code"}
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "الصف" : "Class"}
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "الهاتف" : "Phone"}
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "النوع" : "Gender"}
                 </th>
-
                 <th className="px-5 py-4 text-sm font-semibold text-slate-600">
                   {isArabic ? "الحالة" : "Status"}
                 </th>
-
                 <th className="px-5 py-4 text-center text-sm font-semibold text-slate-600">
                   {isArabic ? "الإجراءات" : "Actions"}
                 </th>
@@ -516,7 +439,6 @@ export default function StudentsPage() {
                           <p className="font-semibold text-slate-800">
                             {translateStudentName(student.name)}
                           </p>
-
                           <p dir="ltr" className="text-xs text-slate-400">
                             {student.email}
                           </p>
@@ -588,11 +510,9 @@ export default function StudentsPage() {
                 <tr>
                   <td colSpan={7} className="px-5 py-16 text-center">
                     <Users className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-
                     <p className="font-semibold text-slate-500">
                       {isArabic ? "لا يوجد طلاب" : "No Students Found"}
                     </p>
-
                     <p className="mt-1 text-sm text-slate-400">
                       {isArabic
                         ? "جرّبي تغيير البحث أو الصف المحدد"
@@ -623,7 +543,6 @@ export default function StudentsPage() {
                       <h3 className="font-bold text-slate-800">
                         {translateStudentName(student.name)}
                       </h3>
-
                       <p dir="ltr" className="text-xs text-slate-400">
                         {student.code}
                       </p>
@@ -646,7 +565,6 @@ export default function StudentsPage() {
                     <p className="text-xs text-slate-400">
                       {isArabic ? "الصف" : "Class"}
                     </p>
-
                     <p className="mt-1 font-semibold text-slate-700">
                       {translateClass(student.className)}
                     </p>
@@ -656,7 +574,6 @@ export default function StudentsPage() {
                     <p className="text-xs text-slate-400">
                       {isArabic ? "النوع" : "Gender"}
                     </p>
-
                     <p className="mt-1 font-semibold text-slate-700">
                       {translateGender(student.gender)}
                     </p>
@@ -666,7 +583,6 @@ export default function StudentsPage() {
                     <p className="text-xs text-slate-400">
                       {isArabic ? "الهاتف" : "Phone"}
                     </p>
-
                     <p dir="ltr" className="mt-1 font-semibold text-slate-700">
                       {student.phone || "—"}
                     </p>
@@ -680,7 +596,6 @@ export default function StudentsPage() {
                     className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-50 py-2.5 text-sm font-semibold text-blue-600"
                   >
                     <Eye className="h-4 w-4" />
-
                     {isArabic ? "عرض" : "View"}
                   </button>
 
@@ -690,7 +605,6 @@ export default function StudentsPage() {
                     className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-50 py-2.5 text-sm font-semibold text-amber-600"
                   >
                     <Pencil className="h-4 w-4" />
-
                     {isArabic ? "تعديل" : "Edit"}
                   </button>
 
@@ -701,7 +615,6 @@ export default function StudentsPage() {
                     className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-50 py-2.5 text-sm font-semibold text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
-
                     {isArabic ? "حذف" : "Delete"}
                   </button>
                 </div>
@@ -710,7 +623,6 @@ export default function StudentsPage() {
           ) : (
             <div className="py-12 text-center">
               <Users className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-
               <p className="font-semibold text-slate-500">
                 {isArabic ? "لا يوجد طلاب" : "No Students Found"}
               </p>
@@ -723,13 +635,11 @@ export default function StudentsPage() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-white shadow-2xl">
-            {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 p-6">
               <div>
                 <h2 className="text-xl font-bold text-slate-800">
                   {isArabic ? "إضافة طالب جديد" : "Add New Student"}
                 </h2>
-
                 <p className="mt-1 text-sm text-slate-500">
                   {isArabic
                     ? "أدخل بيانات الطالب"
@@ -747,14 +657,11 @@ export default function StudentsPage() {
               </button>
             </div>
 
-            {/* Form */}
             <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
-              {/* Name */}
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   {isArabic ? "اسم الطالب" : "Student Name"}
                 </label>
-
                 <input
                   type="text"
                   value={newStudent.name}
@@ -771,12 +678,10 @@ export default function StudentsPage() {
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   {isArabic ? "البريد الإلكتروني" : "Email Address"}
                 </label>
-
                 <input
                   type="email"
                   value={newStudent.email}
@@ -792,12 +697,10 @@ export default function StudentsPage() {
                 />
               </div>
 
-              {/* Phone */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   {isArabic ? "رقم الهاتف" : "Phone Number"}
                 </label>
-
                 <input
                   type="text"
                   value={newStudent.phone}
@@ -813,12 +716,10 @@ export default function StudentsPage() {
                 />
               </div>
 
-              {/* Class */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   {isArabic ? "الصف الدراسي" : "Class"}
                 </label>
-
                 <select
                   value={newStudent.className}
                   onChange={(e) =>
@@ -839,12 +740,10 @@ export default function StudentsPage() {
                 </select>
               </div>
 
-              {/* Gender */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   {isArabic ? "النوع" : "Gender"}
                 </label>
-
                 <select
                   value={newStudent.gender}
                   onChange={(e) =>
@@ -856,13 +755,11 @@ export default function StudentsPage() {
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#0B192C]"
                 >
                   <option value="ذكر">{isArabic ? "ذكر" : "Male"}</option>
-
                   <option value="أنثى">{isArabic ? "أنثى" : "Female"}</option>
                 </select>
               </div>
             </div>
 
-            {/* Modal Buttons */}
             <div className="flex flex-col-reverse gap-3 border-t border-slate-100 p-6 sm:flex-row sm:justify-end">
               <button
                 type="button"
@@ -883,6 +780,12 @@ export default function StudentsPage() {
           </div>
         </div>
       )}
+
+      {/* School Charts */}
+      <div className="mt-8">
+       <StudentsPage />
+        <SchoolCharts language={language} />
+      </div>
     </div>
   );
 }
