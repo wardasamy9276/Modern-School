@@ -13,6 +13,7 @@ import Activities from "./home/Activities";
 function page() {
   return (
     <div>
+
       <Hero />
       <FeaturesPage />
       <Activities />
