@@ -31,7 +31,7 @@ export default function HeroSection() {
     <section
       className="
     relative
-    bg-[#0B192C]
+    bg-[#044253]
     text-white
     min-h-screen
     flex

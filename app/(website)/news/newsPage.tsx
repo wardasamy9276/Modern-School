@@ -1,7 +1,13 @@
 
 "use client";
 
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import Link from "next/link";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -18,10 +24,7 @@ type NewsItem = {
   featured?: boolean;
 };
 
-// ======================================================
-// NEWS DATA
-// لإضافة أخبار افتراضية جديدة يمكنك إضافتها هنا أيضًا
-// ======================================================
+type NewsForm = Omit<NewsItem, "id">;
 
 const initialNewsItems: NewsItem[] = [
   {
@@ -358,9 +361,34 @@ const initialNewsItems: NewsItem[] = [
   },
 ];
 
-// ======================================================
-// COMPONENT
-// ======================================================
+const emptyForm: NewsForm = {
+  titleAr: "",
+  titleEn: "",
+  descriptionAr: "",
+  descriptionEn: "",
+  categoryAr: "",
+  categoryEn: "",
+  date: new Date().toISOString().slice(0, 10),
+  image: "",
+  featured: false,
+};
+
+const resolveImage = (image: string) => {
+  const value = image.trim();
+
+  if (!value) return "";
+
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:image/") ||
+    value.startsWith("/")
+  ) {
+    return value;
+  }
+
+  return `/images/${value}`;
+};
 
 export default function NewsPage() {
   const { language } = useLanguage();
@@ -374,32 +402,18 @@ export default function NewsPage() {
 
   const [showManagement, setShowManagement] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState<NewsForm>(emptyForm);
 
-  const emptyForm: Omit<NewsItem, "id"> = {
-    titleAr: "",
-    titleEn: "",
-    descriptionAr: "",
-    descriptionEn: "",
-    categoryAr: "",
-    categoryEn: "",
-    date: new Date().toISOString().slice(0, 10),
-    image: "",
-    featured: false,
-  };
-
-  const [formData, setFormData] = useState(emptyForm);
-
-  // ======================================================
-  // TRANSLATIONS
-  // ======================================================
+  const [successMessage, setSuccessMessage] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   const content = {
     ar: {
       badge: "مركز أخبار الرواد",
       title: "آخر أخبار",
       titleHighlight: "مدرسة الرواد الحديثة",
-      subtitle:
-        "تابع أحدث أخبار المدرسة والفعاليات والأنشطة والإنجازات الطلابية، وكن دائمًا على اطلاع بكل ما يحدث داخل مجتمعنا التعليمي.",
+      subtitle: "تابع أحدث أخبار المدرسة والفعاليات والأنشطة والإنجازات الطلابية، وكن دائمًا على اطلاع بكل ما يحدث داخل مجتمعنا التعليمي.",
       search: "ابحث عن خبر...",
       all: "جميع الأخبار",
       featured: "الخبر الرئيسي",
@@ -410,8 +424,7 @@ export default function NewsPage() {
       reset: "عرض جميع الأخبار",
       explore: "اكتشف المزيد",
       ctaTitle: "كن جزءًا من مجتمع الرواد",
-      ctaDesc:
-        "اكتشف بيئة تعليمية تهتم بالمعرفة والإبداع وتنمية مهارات الطلاب.",
+      ctaDesc: "اكتشف بيئة تعليمية تهتم بالمعرفة والإبداع وتنمية مهارات الطلاب.",
       contact: "تواصل معنا",
       admission: "التقديم والقبول",
       newsCount: "خبر",
@@ -432,7 +445,10 @@ export default function NewsPage() {
       categoryAr: "التصنيف بالعربي",
       categoryEn: "التصنيف بالإنجليزي",
       date: "تاريخ الخبر",
-      image: "رابط الصورة",
+      image: "اسم الصورة أو مسارها",
+      imageUpload: "رفع صورة من الجهاز",
+      imageHint: "اختاري صورة من جهازك أو اكتبي اسمها أو رابطها. الصورة اختيارية.",
+      chooseImage: "اختيار صورة",
       imagePreview: "معاينة الصورة",
       featuredOption: "عرض الخبر كخبر رئيسي",
       required: "من فضلك املئي جميع الحقول المطلوبة",
@@ -441,13 +457,19 @@ export default function NewsPage() {
       imageError: "تعذر تحميل الصورة",
       featuredLabel: "خبر رئيسي",
       searchManagement: "ابحث في الأخبار لإدارتها",
+      added: "تم إرسال الخبر بنجاح",
+      updated: "تم تحديث الخبر بنجاح",
+      deleted: "تم حذف الخبر بنجاح",
+      uploadError: "من فضلك اختاري ملف صورة صحيح.",
+      uploadSize: "حجم الصورة كبير. الحد الأقصى 1 ميجابايت.",
+      noImage: "لا توجد صورة",
+      fileName: "اسم الملف",
     },
     en: {
       badge: "Al Rowad News Center",
       title: "Latest News",
       titleHighlight: "Al Rowad Modern School",
-      subtitle:
-        "Follow the latest school news, events, activities, and student achievements. Stay informed about everything happening in our educational community.",
+      subtitle: "Follow the latest school news, events, activities, and student achievements. Stay informed about everything happening in our educational community.",
       search: "Search news...",
       all: "All News",
       featured: "Featured Story",
@@ -458,8 +480,7 @@ export default function NewsPage() {
       reset: "Show All News",
       explore: "Explore More",
       ctaTitle: "Be Part of Al Rowad Community",
-      ctaDesc:
-        "Discover a learning environment that values knowledge, creativity, and student development.",
+      ctaDesc: "Discover a learning environment that values knowledge, creativity, and student development.",
       contact: "Contact Us",
       admission: "Admissions",
       newsCount: "Articles",
@@ -480,7 +501,10 @@ export default function NewsPage() {
       categoryAr: "Arabic Category",
       categoryEn: "English Category",
       date: "News Date",
-      image: "Image URL",
+      image: "Image name or path",
+      imageUpload: "Upload an image from your device",
+      imageHint: "Choose an image from your device, or enter its name or URL. Image is optional.",
+      chooseImage: "Choose Image",
       imagePreview: "Image Preview",
       featuredOption: "Set as Featured News",
       required: "Please complete all required fields",
@@ -489,14 +513,17 @@ export default function NewsPage() {
       imageError: "Unable to load image",
       featuredLabel: "Featured",
       searchManagement: "Search news to manage",
+      added: "News was submitted successfully",
+      updated: "News was updated successfully",
+      deleted: "News was deleted successfully",
+      uploadError: "Please choose a valid image file.",
+      uploadSize: "Image is too large. Maximum size is 1 MB.",
+      noImage: "No image",
+      fileName: "File name",
     },
   };
 
   const t = isArabic ? content.ar : content.en;
-
-  // ======================================================
-  // LOCAL STORAGE
-  // ======================================================
 
   useEffect(() => {
     try {
@@ -523,17 +550,18 @@ export default function NewsPage() {
       localStorage.setItem("rowad-news", JSON.stringify(newsItems));
     } catch (error) {
       console.error("Error saving news:", error);
-      alert(
-        isArabic
-          ? "تعذر حفظ البيانات. قد تكون مساحة التخزين ممتلئة."
-          : "Unable to save data. Storage may be full."
-      );
     }
-  }, [newsItems, isLoaded, isArabic]);
+  }, [newsItems, isLoaded]);
 
-  // ======================================================
-  // FORM HANDLING
-  // ======================================================
+  useEffect(() => {
+    if (!successMessage) return;
+
+    const timer = window.setTimeout(() => {
+      setSuccessMessage("");
+    }, 4500);
+
+    return () => window.clearTimeout(timer);
+  }, [successMessage]);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -544,6 +572,45 @@ export default function NewsPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // رفع الصورة مباشرة من الجهاز
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setImageError(t.uploadError);
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 1024 * 1024) {
+      setImageError(t.uploadSize);
+      e.target.value = "";
+      return;
+    }
+
+    setImageError("");
+    setUploadedFileName(file.name);
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setFormData((prev) => ({
+          ...prev,
+          image: reader.result as string,
+        }));
+      }
+    };
+
+    reader.onerror = () => {
+      setImageError(t.uploadError);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const handleSaveNews = (e: FormEvent<HTMLFormElement>) => {
@@ -557,7 +624,6 @@ export default function NewsPage() {
       formData.categoryAr,
       formData.categoryEn,
       formData.date,
-      formData.image,
     ];
 
     if (requiredFields.some((field) => !field.trim())) {
@@ -565,18 +631,7 @@ export default function NewsPage() {
       return;
     }
 
-    const imageIsValid = /^https?:\/\/.+/i.test(formData.image.trim());
-
-    if (!imageIsValid) {
-      alert(
-        isArabic
-          ? "من فضلك أدخلي رابط صورة صحيح يبدأ بـ https:// أو http://"
-          : "Please enter a valid image URL starting with https:// or http://"
-      );
-      return;
-    }
-
-    const cleanData = {
+    const cleanData: NewsForm = {
       ...formData,
       titleAr: formData.titleAr.trim(),
       titleEn: formData.titleEn.trim(),
@@ -597,7 +652,6 @@ export default function NewsPage() {
             };
           }
 
-          // في حالة اختيار الخبر الحالي كخبر رئيسي
           if (cleanData.featured) {
             return {
               ...item,
@@ -608,6 +662,8 @@ export default function NewsPage() {
           return item;
         })
       );
+
+      setSuccessMessage(t.updated);
     } else {
       const newId =
         Math.max(0, ...newsItems.map((item) => item.id)) + 1;
@@ -625,9 +681,17 @@ export default function NewsPage() {
             : item
         ),
       ]);
+
+      setSuccessMessage(t.added);
     }
 
-    setFormData(emptyForm);
+    setFormData({
+      ...emptyForm,
+      date: new Date().toISOString().slice(0, 10),
+    });
+
+    setUploadedFileName("");
+    setImageError("");
     setEditingId(null);
     setShowManagement(false);
     setActiveCategory("all");
@@ -639,10 +703,6 @@ export default function NewsPage() {
     });
   };
 
-  // ======================================================
-  // EDIT NEWS
-  // ======================================================
-
   const handleEditNews = (item: NewsItem) => {
     setFormData({
       titleAr: item.titleAr,
@@ -652,10 +712,12 @@ export default function NewsPage() {
       categoryAr: item.categoryAr,
       categoryEn: item.categoryEn,
       date: item.date,
-      image: item.image,
+      image: item.image || "",
       featured: !!item.featured,
     });
 
+    setUploadedFileName("");
+    setImageError("");
     setEditingId(item.id);
     setShowManagement(true);
 
@@ -664,10 +726,6 @@ export default function NewsPage() {
       behavior: "smooth",
     });
   };
-
-  // ======================================================
-  // DELETE NEWS
-  // ======================================================
 
   const handleDeleteNews = (id: number) => {
     const confirmed = window.confirm(t.deleteConfirm);
@@ -683,21 +741,21 @@ export default function NewsPage() {
       setFormData(emptyForm);
       setShowManagement(false);
     }
+
+    setSuccessMessage(t.deleted);
   };
 
-  // ======================================================
-  // CANCEL FORM
-  // ======================================================
-
   const handleCancelEdit = () => {
-    setFormData(emptyForm);
+    setFormData({
+      ...emptyForm,
+      date: new Date().toISOString().slice(0, 10),
+    });
+
+    setUploadedFileName("");
+    setImageError("");
     setEditingId(null);
     setShowManagement(false);
   };
-
-  // ======================================================
-  // CATEGORIES
-  // ======================================================
 
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
@@ -705,7 +763,10 @@ export default function NewsPage() {
     );
 
     return [
-      { value: "all", label: t.all },
+      {
+        value: "all",
+        label: t.all,
+      },
       ...uniqueCategories.map((category) => {
         const item = newsItems.find(
           (news) => news.categoryAr === category
@@ -720,10 +781,6 @@ export default function NewsPage() {
       }),
     ];
   }, [newsItems, isArabic, t.all]);
-
-  // ======================================================
-  // SEARCH AND FILTER
-  // ======================================================
 
   const filteredNews = useMemo(() => {
     return newsItems.filter((item) => {
@@ -753,10 +810,6 @@ export default function NewsPage() {
     (item) => item.id !== featuredNews?.id
   );
 
-  // ======================================================
-  // DATE FORMAT
-  // ======================================================
-
   const formatDate = (date: string) => {
     return new Date(`${date}T12:00:00`).toLocaleDateString(
       isArabic ? "ar-EG" : "en-US",
@@ -767,10 +820,6 @@ export default function NewsPage() {
       }
     );
   };
-
-  // ======================================================
-  // LOADING
-  // ======================================================
 
   if (!isLoaded) {
     return (
@@ -785,38 +834,57 @@ export default function NewsPage() {
     );
   }
 
-  // ======================================================
-  // RENDER
-  // ======================================================
-
   return (
     <main
       dir={isArabic ? "rtl" : "ltr"}
       className="min-h-screen overflow-hidden bg-[#f4f9fa] text-slate-800"
     >
-      {/* ==================================================
-          NEWS MANAGEMENT
-      ================================================== */}
+      {/* SUCCESS MESSAGE */}
+
+      {successMessage && (
+        <div className="fixed top-5 left-1/2 z-[100] w-[calc(100%-32px)] max-w-md -translate-x-1/2">
+          <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-5 py-4 shadow-2xl">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xl text-emerald-700">
+              ✓
+            </span>
+            <div>
+              <p className="font-black text-emerald-700">
+                {successMessage}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {isArabic
+                  ? "تم حفظ التغييرات في المتصفح."
+                  : "Changes have been saved in this browser."}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSuccessMessage("")}
+              className="ms-auto text-xl text-slate-400 hover:text-slate-700"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* NEWS MANAGEMENT */}
 
       <section className="relative z-10 mx-auto max-w-7xl px-5 pt-8">
-
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-cyan-100 bg-white p-5 shadow-lg">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 text-xl">
+              📰
+            </span>
 
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 text-xl">
-                📰
-              </span>
-
-              <div>
-                <h2 className="text-xl font-black text-[#073b4c]">
-                  {t.management}
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  {t.total}: {newsItems.length}
-                </p>
-              </div>
+            <div>
+              <h2 className="text-xl font-black text-[#073b4c]">
+                {t.management}
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {t.total}: {newsItems.length}
+              </p>
             </div>
           </div>
 
@@ -827,6 +895,7 @@ export default function NewsPage() {
                 handleCancelEdit();
               } else {
                 setFormData(emptyForm);
+                setUploadedFileName("");
                 setEditingId(null);
                 setShowManagement(true);
 
@@ -838,11 +907,8 @@ export default function NewsPage() {
             }}
             className="rounded-xl bg-[#075568] px-6 py-3 font-bold text-white transition hover:bg-[#0e7490]"
           >
-            {showManagement
-              ? t.close
-              : `+ ${t.addNews}`}
+            {showManagement ? t.close : `+ ${t.addNews}`}
           </button>
-
         </div>
 
         {/* ADD / EDIT FORM */}
@@ -852,7 +918,6 @@ export default function NewsPage() {
             onSubmit={handleSaveNews}
             className="mt-6 rounded-3xl border border-cyan-100 bg-white p-6 shadow-xl md:p-9"
           >
-
             <div className="mb-8 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-2xl">
                 {editingId !== null ? "✏️" : "➕"}
@@ -860,9 +925,7 @@ export default function NewsPage() {
 
               <div>
                 <h3 className="text-2xl font-black text-[#073b4c]">
-                  {editingId !== null
-                    ? t.editNews
-                    : t.addNews}
+                  {editingId !== null ? t.editNews : t.addNews}
                 </h3>
 
                 <p className="mt-1 text-sm text-slate-500">
@@ -874,14 +937,10 @@ export default function NewsPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-
-              {/* Arabic Title */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.titleAr} *
                 </label>
-
                 <input
                   name="titleAr"
                   value={formData.titleAr}
@@ -893,13 +952,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* English Title */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.titleEn} *
                 </label>
-
                 <input
                   name="titleEn"
                   value={formData.titleEn}
@@ -911,13 +967,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* Arabic Description */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.descriptionAr} *
                 </label>
-
                 <textarea
                   name="descriptionAr"
                   value={formData.descriptionAr}
@@ -930,13 +983,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* English Description */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.descriptionEn} *
                 </label>
-
                 <textarea
                   name="descriptionEn"
                   value={formData.descriptionEn}
@@ -949,13 +999,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* Arabic Category */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.categoryAr} *
                 </label>
-
                 <input
                   name="categoryAr"
                   value={formData.categoryAr}
@@ -967,13 +1014,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* English Category */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.categoryEn} *
                 </label>
-
                 <input
                   name="categoryEn"
                   value={formData.categoryEn}
@@ -985,13 +1029,10 @@ export default function NewsPage() {
                 />
               </div>
 
-              {/* Date */}
-
               <div>
                 <label className="mb-2 block font-bold text-[#073b4c]">
                   {t.date} *
                 </label>
-
                 <input
                   type="date"
                   name="date"
@@ -1001,49 +1042,123 @@ export default function NewsPage() {
                   className="w-full rounded-xl border border-cyan-100 bg-[#f8fcfd] p-4 outline-none transition focus:border-[#0e7490] focus:ring-4 focus:ring-cyan-50"
                 />
               </div>
-
-              {/* Image URL */}
-
-              <div>
-                <label className="mb-2 block font-bold text-[#073b4c]">
-                  {t.image} *
-                </label>
-
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  required
-                  dir="ltr"
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full rounded-xl border border-cyan-100 bg-[#f8fcfd] p-4 outline-none transition focus:border-[#0e7490] focus:ring-4 focus:ring-cyan-50"
-                />
-              </div>
-
             </div>
 
-            {/* IMAGE PREVIEW */}
+            {/* IMAGE UPLOAD AND IMAGE NAME */}
 
-            {formData.image && (
-              <div className="mt-7">
-                <p className="mb-3 font-bold text-[#073b4c]">
-                  {t.imagePreview}
+            <div className="mt-8 rounded-2xl border border-dashed border-cyan-300 bg-[#f5fbfc] p-5 md:p-7">
+              <div className="mb-5">
+                <h4 className="text-lg font-black text-[#073b4c]">
+                  🖼️ {t.imageUpload}
+                </h4>
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  {t.imageHint}
                 </p>
-
-                <img
-                  src={formData.image}
-                  alt="News Preview"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                  onLoad={(e) => {
-                    e.currentTarget.style.display = "block";
-                  }}
-                  className="h-56 w-full rounded-2xl border border-cyan-100 object-cover md:w-96"
-                />
               </div>
-            )}
+
+              <div className="grid gap-5 md:grid-cols-2">
+                {/* UPLOAD FILE */}
+
+                <div>
+                  <label className="mb-2 block font-bold text-[#073b4c]">
+                    {t.chooseImage}
+                  </label>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="block w-full cursor-pointer rounded-xl border border-cyan-100 bg-white p-3 text-sm text-slate-600 file:me-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#075568] file:px-4 file:py-2 file:font-bold file:text-white hover:file:bg-[#0e7490]"
+                  />
+
+                  {uploadedFileName && (
+                    <p className="mt-3 break-all text-sm font-semibold text-emerald-700">
+                      ✓ {t.fileName}: {uploadedFileName}
+                    </p>
+                  )}
+                </div>
+
+                {/* IMAGE NAME / URL / PATH */}
+
+                <div>
+                  <label className="mb-2 block font-bold text-[#073b4c]">
+                    {t.image}
+                  </label>
+
+                  <input
+                    type="text"
+                    name="image"
+                    value={
+                      formData.image.startsWith("data:image/")
+                        ? uploadedFileName
+                        : formData.image
+                    }
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        image: e.target.value,
+                      }));
+                      setUploadedFileName("");
+                      setImageError("");
+                    }}
+                    dir="ltr"
+                    placeholder="school.jpg أو /images/school.jpg أو https://..."
+                    className="w-full rounded-xl border border-cyan-100 bg-white p-4 outline-none transition focus:border-[#0e7490] focus:ring-4 focus:ring-cyan-50"
+                  />
+
+                  <p className="mt-2 text-xs leading-6 text-slate-500">
+                    {isArabic
+                      ? "لو كتبتي school.jpg سيتم البحث عنها داخل public/images."
+                      : "If you enter school.jpg, it will be loaded from public/images."}
+                  </p>
+                </div>
+              </div>
+
+              {imageError && (
+                <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-600">
+                  {imageError}
+                </p>
+              )}
+
+              {/* IMAGE PREVIEW */}
+
+              {formData.image && (
+                <div className="mt-7">
+                  <p className="mb-3 font-bold text-[#073b4c]">
+                    {t.imagePreview}
+                  </p>
+
+                  <div className="relative w-full overflow-hidden rounded-2xl border border-cyan-100 bg-white md:w-96">
+                    <img
+                      src={resolveImage(formData.image)}
+                      alt="News Preview"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.style.display = "block";
+                      }}
+                      className="h-56 w-full object-cover"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          image: "",
+                        }));
+                        setUploadedFileName("");
+                        setImageError("");
+                      }}
+                      className="absolute right-3 top-3 rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white shadow-lg hover:bg-red-700"
+                    >
+                      {isArabic ? "إزالة الصورة" : "Remove Image"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* FEATURED OPTION */}
 
@@ -1059,14 +1174,12 @@ export default function NewsPage() {
                 }
                 className="h-5 w-5 accent-[#0e7490]"
               />
-
               ⭐ {t.featuredOption}
             </label>
 
             {/* FORM BUTTONS */}
 
             <div className="mt-8 flex flex-wrap gap-3">
-
               <button
                 type="submit"
                 className="rounded-xl bg-[#0e7490] px-8 py-4 font-bold text-white shadow-lg shadow-cyan-900/10 transition hover:bg-[#075568]"
@@ -1083,26 +1196,19 @@ export default function NewsPage() {
               >
                 {t.cancel}
               </button>
-
             </div>
-
           </form>
         )}
-
       </section>
 
-      {/* ==================================================
-          HERO
-      ================================================== */}
+      {/* HERO */}
 
       <section className="relative mt-8 overflow-hidden bg-gradient-to-br from-[#062f3b] via-[#075568] to-[#0e7490] px-5 py-24 text-white md:py-32">
-
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-cyan-300/10 blur-3xl" />
         <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-teal-300/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl">
           <div className="max-w-4xl">
-
             <span className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-bold text-cyan-100 backdrop-blur">
               <span className="h-2 w-2 rounded-full bg-cyan-300" />
               {t.badge}
@@ -1110,7 +1216,6 @@ export default function NewsPage() {
 
             <h1 className="text-4xl font-black leading-tight tracking-tight md:text-6xl lg:text-7xl">
               {t.title}
-
               <span className="mt-3 block text-cyan-300">
                 {t.titleHighlight}
               </span>
@@ -1121,12 +1226,10 @@ export default function NewsPage() {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
-
               <div className="rounded-2xl border border-white/15 bg-white/10 px-6 py-4 backdrop-blur">
                 <p className="text-3xl font-black text-cyan-300">
                   {newsItems.length}+
                 </p>
-
                 <p className="mt-1 text-sm text-white/80">
                   {t.allNews}
                 </p>
@@ -1136,45 +1239,34 @@ export default function NewsPage() {
                 <p className="text-3xl font-black text-cyan-300">
                   {categories.length - 1}
                 </p>
-
                 <p className="mt-1 text-sm text-white/80">
                   {isArabic ? "تصنيفات متنوعة" : "News Categories"}
                 </p>
               </div>
-
             </div>
-
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 h-2 w-full bg-gradient-to-r from-cyan-300 via-teal-300 to-[#0e7490]" />
-
       </section>
 
-      {/* ==================================================
-          NEWS CONTENT
-      ================================================== */}
+      {/* NEWS CONTENT */}
 
       <section className="mx-auto max-w-7xl px-5 py-20">
-
         {/* SEARCH */}
 
         <div className="mb-12 rounded-3xl border border-cyan-100 bg-white p-5 shadow-xl shadow-cyan-950/5 md:p-8">
-
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
             <div>
               <span className="text-sm font-bold text-[#0e7490]">
                 {t.explore}
               </span>
-
               <h2 className="mt-2 text-2xl font-black text-[#073b4c] md:text-3xl">
                 {t.latest}
               </h2>
             </div>
 
             <div className="relative w-full lg:max-w-xl">
-
               <span
                 className={`absolute top-1/2 -translate-y-1/2 text-xl text-[#0e7490] ${
                   isArabic ? "right-5" : "left-5"
@@ -1192,15 +1284,12 @@ export default function NewsPage() {
                   isArabic ? "pr-14 pl-5" : "pl-14 pr-5"
                 }`}
               />
-
             </div>
-
           </div>
 
           {/* CATEGORIES */}
 
           <div className="mt-8 flex flex-wrap gap-3">
-
             {categories.map((category) => (
               <button
                 key={category.value}
@@ -1215,35 +1304,33 @@ export default function NewsPage() {
                 {category.label}
               </button>
             ))}
-
           </div>
-
         </div>
 
-        {/* ==================================================
-            FEATURED NEWS
-        ================================================== */}
+        {/* FEATURED NEWS */}
 
         {featuredNews && (
           <div className="mb-16">
-
             <div className="mb-7 flex items-center gap-3">
               <span className="h-8 w-1.5 rounded-full bg-[#0e7490]" />
-
               <h2 className="text-2xl font-black text-[#073b4c] md:text-3xl">
                 {t.featured}
               </h2>
             </div>
 
             <article className="group grid overflow-hidden rounded-[2rem] border border-cyan-100 bg-white shadow-xl shadow-cyan-950/5 transition hover:-translate-y-1 hover:shadow-2xl lg:grid-cols-2">
-
-              <div className="relative min-h-[300px] overflow-hidden lg:min-h-[480px]">
-
-                <img
-                  src={featuredNews.image}
-                  alt={isArabic ? featuredNews.titleAr : featuredNews.titleEn}
-                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+              <div className="relative min-h-[300px] overflow-hidden bg-cyan-50 lg:min-h-[480px]">
+                {featuredNews.image ? (
+                  <img
+                    src={resolveImage(featuredNews.image)}
+                    alt={isArabic ? featuredNews.titleAr : featuredNews.titleEn}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full min-h-[300px] items-center justify-center text-6xl">
+                    📰
+                  </div>
+                )}
 
                 <div className="absolute inset-0 bg-gradient-to-t from-[#062f3b]/60 to-transparent" />
 
@@ -1252,11 +1339,9 @@ export default function NewsPage() {
                     ? featuredNews.categoryAr
                     : featuredNews.categoryEn}
                 </span>
-
               </div>
 
               <div className="flex flex-col justify-center p-7 md:p-12">
-
                 <div className="mb-6 flex items-center gap-3 text-sm font-semibold text-[#0e7490]">
                   <span>📅</span>
                   <span>{formatDate(featuredNews.date)}</span>
@@ -1275,16 +1360,13 @@ export default function NewsPage() {
                 </p>
 
                 <div className="mt-9">
-                  <span className="inline-flex items-center gap-3 rounded-xl bg-[#0e7490] px-7 py-4 font-bold text-white transition hover:bg-[#075568]">
+                  <span className="inline-flex items-center gap-3 rounded-xl bg-[#0e7490] px-7 py-4 font-bold text-white">
                     {t.readMore}
                     <span>{isArabic ? "←" : "→"}</span>
                   </span>
                 </div>
 
-                {/* FEATURED EDIT AND DELETE */}
-
                 <div className="mt-6 flex flex-wrap gap-3">
-
                   <button
                     type="button"
                     onClick={() => handleEditNews(featuredNews)}
@@ -1300,25 +1382,17 @@ export default function NewsPage() {
                   >
                     🗑️ {t.delete}
                   </button>
-
                 </div>
-
               </div>
-
             </article>
-
           </div>
         )}
 
-        {/* ==================================================
-            NEWS GRID
-        ================================================== */}
+        {/* NEWS GRID */}
 
         <div className="mb-8 flex items-center justify-between gap-4">
-
           <div className="flex items-center gap-3">
             <span className="h-8 w-1.5 rounded-full bg-[#0e7490]" />
-
             <h2 className="text-2xl font-black text-[#073b4c] md:text-3xl">
               {t.latest}
             </h2>
@@ -1327,42 +1401,37 @@ export default function NewsPage() {
           <span className="rounded-xl bg-cyan-100 px-4 py-2 text-sm font-bold text-[#0e7490]">
             {filteredNews.length} {t.newsCount}
           </span>
-
         </div>
 
         {regularNews.length > 0 ? (
-
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-
             {regularNews.map((item) => (
-
               <article
                 key={item.id}
                 className="group flex h-full flex-col overflow-hidden rounded-3xl border border-cyan-100 bg-white shadow-lg shadow-cyan-950/5 transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-cyan-900/10"
               >
-
-                <div className="relative h-60 overflow-hidden">
-
-                  <img
-                    src={item.image}
-                    alt={isArabic ? item.titleAr : item.titleEn}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                  />
+                <div className="relative h-60 overflow-hidden bg-cyan-50">
+                  {item.image ? (
+                    <img
+                      src={resolveImage(item.image)}
+                      alt={isArabic ? item.titleAr : item.titleEn}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-5xl">
+                      📰
+                    </div>
+                  )}
 
                   <div className="absolute inset-0 bg-gradient-to-t from-[#062f3b]/40 to-transparent opacity-70" />
 
                   <span className="absolute right-5 top-5 rounded-xl bg-white/95 px-4 py-2 text-xs font-bold text-[#0e7490] shadow-lg">
                     {isArabic ? item.categoryAr : item.categoryEn}
                   </span>
-
                 </div>
 
                 <div className="flex flex-1 flex-col p-7">
-
-                  {/* EDIT AND DELETE */}
-
                   <div className="mb-5 flex flex-wrap gap-2">
-
                     <button
                       type="button"
                       onClick={() => handleEditNews(item)}
@@ -1378,7 +1447,6 @@ export default function NewsPage() {
                     >
                       🗑️ {t.delete}
                     </button>
-
                   </div>
 
                   <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-slate-400">
@@ -1397,26 +1465,17 @@ export default function NewsPage() {
                   </p>
 
                   <div className="border-t border-cyan-50 pt-5">
-
-                    <span className="inline-flex items-center gap-2 text-sm font-black text-[#0e7490] transition group-hover:gap-4">
+                    <span className="inline-flex items-center gap-2 text-sm font-black text-[#0e7490]">
                       {t.readMore}
                       <span>{isArabic ? "←" : "→"}</span>
                     </span>
-
                   </div>
-
                 </div>
-
               </article>
-
             ))}
-
           </div>
-
         ) : (
-
           <div className="rounded-3xl border border-dashed border-cyan-200 bg-white px-6 py-20 text-center">
-
             <div className="mb-5 text-6xl">📰</div>
 
             <h3 className="text-2xl font-black text-[#073b4c]">
@@ -1437,26 +1496,18 @@ export default function NewsPage() {
             >
               {t.reset}
             </button>
-
           </div>
-
         )}
-
       </section>
 
-      {/* ==================================================
-          CTA
-      ================================================== */}
+      {/* CTA */}
 
       <section className="px-5 pb-20">
-
         <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#062f3b] via-[#075568] to-[#0e7490] px-7 py-16 text-center text-white md:px-16 md:py-20">
-
           <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-300/10 blur-3xl" />
           <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" />
 
           <div className="relative">
-
             <span className="text-5xl">🎓</span>
 
             <h2 className="mt-7 text-3xl font-black md:text-5xl">
@@ -1468,7 +1519,6 @@ export default function NewsPage() {
             </p>
 
             <div className="mt-9 flex flex-wrap justify-center gap-4">
-
               <Link
                 href="/contact"
                 className="rounded-xl bg-white px-8 py-4 font-black text-[#075568] transition hover:bg-cyan-100"
@@ -1482,15 +1532,10 @@ export default function NewsPage() {
               >
                 {t.admission}
               </Link>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
-
     </main>
   );
 }

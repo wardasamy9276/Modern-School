@@ -388,7 +388,7 @@ export default function ContactPage() {
 
               {/* البريد الإلكتروني - رابط بريدي مباشر */}
               <a
-                href="mailto:admission@smartschools.edu.eg"
+                href="mailto:admission@alrowadmodern School.edu.eg"
                 className="flex items-center gap-3 hover:text-emerald-200 transition-colors break-all"
               >
                 <FaEnvelope className="text-emerald-300 shrink-0" size={18} />

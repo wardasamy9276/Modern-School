@@ -299,32 +299,20 @@
 //   );
 // }
 
-
-
-
 "use client";
 
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { Autoplay, EffectCoverflow } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectCoverflow, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useLanguage } from "../../context/LanguageContext";
 import { schoolsData } from "../home/data/schoolsData";
-
-const Swiper = dynamic(
-  () => import("swiper/react").then((mod) => mod.Swiper),
-  { ssr: false }
-);
-
-const SwiperSlide = dynamic(
-  () => import("swiper/react").then((mod) => mod.SwiperSlide),
-  { ssr: false }
-);
 
 export default function SchoolsSlider() {
   const { language } = useLanguage();
@@ -334,46 +322,54 @@ export default function SchoolsSlider() {
     .sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <section className="py-24 px-5 bg-[#080910] text-white relative overflow-hidden min-h-[700px]">
+    <section className="py-24 px-4 sm:px-6 bg-[#080910] text-white relative overflow-hidden min-h-[700px]">
       {/* Section Title */}
-      <h1 className="text-center mb-16 font-bold text-[34px] text-[#9E7C2F] tracking-tight">
+      <h2 className="text-center mb-16 font-bold text-3xl sm:text-[34px] text-[#9E7C2F] tracking-tight">
         {language === "ar" ? "عملاؤنا" : "Our Clients"}
-      </h1>
+      </h2>
 
       {/* Slider Container */}
-      <div className="relative w-full lg:w-2/3 mx-auto overflow-hidden">
+      <div className="w-full max-w-6xl mx-auto overflow-visible px-2">
         <Swiper
-          modules={[Autoplay, EffectCoverflow]}
-          effect="coverflow"
+          modules={[Autoplay, EffectCoverflow, Pagination]}
+          effect={"coverflow"}
           grabCursor={true}
           centeredSlides={true}
-          slidesPerView="auto"
+          slidesPerView={"auto"}
+          initialSlide={Math.floor(schools.length / 2)}
           coverflowEffect={{
-            rotate: 25,
+            rotate: 20,
             stretch: 0,
-            depth: 150,
+            depth: 120,
             modifier: 1,
-            slideShadows: true,
+            slideShadows: false,
           }}
-          loop={schools.length > 3}
+          loop={schools.length > 2}
           autoplay={{
             delay: 3000,
             disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
           breakpoints={{
+            320: {
+              slidesPerView: 1,
+              spaceBetween: 20,
+            },
             640: {
-              spaceBetween: -40,
+              slidesPerView: "auto",
+              spaceBetween: 30,
             },
             1024: {
-              spaceBetween: -80,
+              slidesPerView: "auto",
+              spaceBetween: 40,
             },
           }}
-          className="w-full"
+          className="w-full py-10"
         >
           {schools.map((school) => (
             <SwiperSlide
               key={school.id}
-              className="!w-[320px] !h-[500px]"
+              className="!w-[290px] sm:!w-[320px] !h-[480px] transition-all duration-300"
             >
               <div
                 className="
@@ -382,13 +378,12 @@ export default function SchoolsSlider() {
                   rounded-[32px] p-6
                   flex flex-col justify-between h-full
                   shadow-2xl transition-all duration-500
-                  swiper-slide-active:border-[#9E7C2F]/40
-                  swiper-slide-active:shadow-[0_30px_70px_rgba(158,124,47,0.2)]
+                  hover:border-[#9E7C2F]/50
                 "
               >
                 {/* School Image */}
-                <div className="w-full h-[210px] flex items-center justify-center relative">
-                  <div className="w-[85%] h-full relative rounded-[20px] overflow-hidden">
+                <div className="w-full h-[190px] flex items-center justify-center relative">
+                  <div className="w-full h-full relative rounded-[20px] overflow-hidden bg-[#181e2b]">
                     <Image
                       src={school.logo}
                       alt={
@@ -397,7 +392,7 @@ export default function SchoolsSlider() {
                           : school.name_en
                       }
                       fill
-                      sizes="272px"
+                      sizes="320px"
                       className="
                         object-cover transition-transform
                         duration-500 group-hover:scale-105
@@ -410,7 +405,7 @@ export default function SchoolsSlider() {
                 <div className="text-center my-4 flex-grow flex flex-col justify-center">
                   <h3
                     className="
-                      text-white font-extrabold text-xl mb-2
+                      text-white font-extrabold text-lg sm:text-xl mb-2
                       tracking-wide group-hover:text-[#9E7C2F]
                       transition-colors line-clamp-1
                     "
@@ -429,7 +424,7 @@ export default function SchoolsSlider() {
 
                 {/* School Details Button */}
                 <div className="w-full mt-auto">
-                  <Link href={`/schools/${school.id}`}>
+                  <Link href={`/schools/${school.id}`} className="block w-full">
                     <Button
                       className="
                         w-full bg-[#181e2b] hover:bg-[#9E7C2F]
@@ -453,14 +448,14 @@ export default function SchoolsSlider() {
       </div>
 
       {/* Student Information Button */}
-      <div className="flex justify-center items-center mt-16">
+      <div className="flex justify-center items-center mt-12">
         <Link href="/thank-you">
           <Button
             className="
-              hidden md:inline-flex text-white
+              text-white
               bg-cyan-700 hover:bg-cyan-900
-              px-10 py-4 rounded-2xl shadow-xl
-              transition-all font-bold
+              px-8 py-3.5 rounded-2xl shadow-xl
+              transition-all font-bold text-sm sm:text-base
             "
           >
             {language === "ar"

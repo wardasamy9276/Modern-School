@@ -22,7 +22,7 @@ type LiveClass = {
   students: number;
 };
 
-const classes: LiveClass[] = [
+const initialClasses: LiveClass[] = [
   {
     id: 1,
     title: "مراجعة شاملة في مادة الرياضيات",
@@ -113,8 +113,24 @@ export default function LiveClassesPage() {
   const { language } = useLanguage();
   const isArabic = language === "ar";
 
+  const [classes, setClasses] = useState<LiveClass[]>(initialClasses);
   const [activeFilter, setActiveFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [formData, setFormData] = useState({
+    title: "",
+    subject: "",
+    teacher: "",
+    stage: "",
+    grade: "",
+    date: "",
+    time: "",
+    duration: "45",
+    meetingUrl: "",
+    students: "0",
+  });
 
   const content = {
     ar: {
@@ -131,10 +147,9 @@ export default function LiveClassesPage() {
       upcomingFilter: "القادمة",
       endedFilter: "المنتهية",
       search: "ابحث عن محاضرة أو مادة أو معلم...",
-      join: "انضم للمحاضرة",
+      join: "الدخول إلى Google Meet",
       waiting: "في انتظار البداية",
       finished: "انتهت المحاضرة",
-      details: "تفاصيل المحاضرة",
       teacher: "المعلم",
       subject: "المادة",
       stage: "المرحلة",
@@ -152,8 +167,31 @@ export default function LiveClassesPage() {
         "تابع جدولك باستمرار وكن مستعدًا للمشاركة والتفاعل مع معلميك.",
       viewAll: "عرض كل المحاضرات",
       backHome: "العودة للرئيسية",
-      minutes: "دقيقة",
       sample: "بيانات تجريبية للعرض",
+      addClass: "إضافة محاضرة جديدة",
+      hideForm: "إغلاق النموذج",
+      formTitle: "بيانات المحاضرة الجديدة",
+      classTitle: "عنوان المحاضرة",
+      subjectName: "اسم المادة",
+      teacherName: "اسم المعلم",
+      stageName: "المرحلة التعليمية",
+      gradeName: "الصف الدراسي",
+      classDate: "تاريخ المحاضرة",
+      classTime: "وقت المحاضرة",
+      classDuration: "مدة المحاضرة بالدقائق",
+      meetingLink: "رابط Google Meet",
+      studentsCount: "عدد الطلاب المسجلين",
+      addButton: "إضافة المحاضرة",
+      cancel: "إلغاء",
+      success: "تم إضافة المحاضرة بنجاح!",
+      required: "من فضلك املأ جميع البيانات المطلوبة.",
+      online: "محاضرة أونلاين",
+      minutes: "دقيقة",
+      choose: "اختر",
+      primary: "المرحلة الابتدائية",
+      preparatory: "المرحلة الإعدادية",
+      secondary: "المرحلة الثانوية",
+      onlineLinkHint: "أضيفي رابط Google Meet حتى يتمكن الطلاب من الدخول.",
     },
     en: {
       eyebrow: "Interactive Learning",
@@ -169,10 +207,9 @@ export default function LiveClassesPage() {
       upcomingFilter: "Upcoming",
       endedFilter: "Ended",
       search: "Search by class, subject, or teacher...",
-      join: "Join Class",
+      join: "Join Google Meet",
       waiting: "Waiting to Start",
       finished: "Class Ended",
-      details: "Class Details",
       teacher: "Teacher",
       subject: "Subject",
       stage: "Stage",
@@ -190,8 +227,31 @@ export default function LiveClassesPage() {
         "Keep track of your schedule and get ready to interact with your teachers.",
       viewAll: "View All Classes",
       backHome: "Back to Home",
-      minutes: "minutes",
       sample: "Sample display data",
+      addClass: "Add New Class",
+      hideForm: "Close Form",
+      formTitle: "New Class Information",
+      classTitle: "Class Title",
+      subjectName: "Subject",
+      teacherName: "Teacher Name",
+      stageName: "Educational Stage",
+      gradeName: "Grade",
+      classDate: "Class Date",
+      classTime: "Class Time",
+      classDuration: "Duration in Minutes",
+      meetingLink: "Google Meet Link",
+      studentsCount: "Registered Students",
+      addButton: "Add Class",
+      cancel: "Cancel",
+      success: "Class added successfully!",
+      required: "Please fill in all required fields.",
+      online: "Online Class",
+      minutes: "minutes",
+      choose: "Choose",
+      primary: "Primary Stage",
+      preparatory: "Preparatory Stage",
+      secondary: "Secondary Stage",
+      onlineLinkHint: "Add a Google Meet link so students can join.",
     },
   };
 
@@ -214,7 +274,7 @@ export default function LiveClassesPage() {
 
       return matchesFilter && matchesSearch;
     });
-  }, [activeFilter, search]);
+  }, [classes, activeFilter, search]);
 
   const liveCount = classes.filter((item) => item.status === "live").length;
   const upcomingCount = classes.filter(
@@ -223,6 +283,8 @@ export default function LiveClassesPage() {
   const endedCount = classes.filter(
     (item) => item.status === "ended"
   ).length;
+
+  const teacherCount = new Set(classes.map((item) => item.teacher)).size;
 
   const formatDate = (date: string) => {
     return new Date(`${date}T12:00:00`).toLocaleDateString(
@@ -241,37 +303,128 @@ export default function LiveClassesPage() {
     return t.endedFilter;
   };
 
+  const updateField = (field: string, value: string) => {
+    setFormData((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      subject: "",
+      teacher: "",
+      stage: "",
+      grade: "",
+      date: "",
+      time: "",
+      duration: "45",
+      meetingUrl: "",
+      students: "0",
+    });
+  };
+
+  const handleAddClass = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (
+      !formData.title.trim() ||
+      !formData.subject.trim() ||
+      !formData.teacher.trim() ||
+      !formData.stage ||
+      !formData.grade.trim() ||
+      !formData.date ||
+      !formData.time ||
+      !formData.duration
+    ) {
+      setSuccessMessage(t.required);
+      return;
+    }
+
+    const newClass: LiveClass = {
+      id: Date.now(),
+      title: formData.title.trim(),
+      subject: formData.subject.trim(),
+      teacher: formData.teacher.trim(),
+      stage: formData.stage,
+      grade: formData.grade.trim(),
+      date: formData.date,
+      time: formData.time,
+      duration: `${formData.duration} ${t.minutes}`,
+      status: "upcoming",
+      meetingUrl: formData.meetingUrl.trim(),
+      students: Math.max(0, Number(formData.students) || 0),
+    };
+
+    setClasses((previous) => [newClass, ...previous]);
+    setActiveFilter("all");
+    setSearch("");
+    resetForm();
+    setShowForm(false);
+    setSuccessMessage(t.success);
+
+    window.setTimeout(() => {
+      setSuccessMessage("");
+    }, 4000);
+  };
+
+  const subjectIcon = (subject: string) => {
+    if (
+      subject.includes("رياضيات") ||
+      subject.toLowerCase().includes("math")
+    )
+      return "📐";
+
+    if (subject.includes("علوم") || subject.toLowerCase().includes("science"))
+      return "🔬";
+
+    if (
+      subject.includes("إنجليزية") ||
+      subject.toLowerCase().includes("english")
+    )
+      return "🌍";
+
+    if (
+      subject.includes("تكنولوجيا") ||
+      subject.toLowerCase().includes("technology")
+    )
+      return "💻";
+
+    return "📚";
+  };
+
   return (
     <main
       dir={isArabic ? "rtl" : "ltr"}
-      className="min-h-screen bg-slate-50 text-slate-800"
+      className="min-h-screen bg-[#f5f9fa] text-[#073b4c]"
     >
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 px-5 py-20 text-white md:py-28">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-400/10 blur-3xl" />
-        <div className="absolute -bottom-24 left-10 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#062f3b] via-[#075568] to-[#0e7490] px-5 py-20 text-white md:py-28">
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" />
+        <div className="absolute -bottom-24 left-10 h-80 w-80 rounded-full bg-cyan-300/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-blue-100">
-            <span className="h-2 w-2 rounded-full bg-green-400" />
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-teal-100">
+            <span className="h-2 w-2 rounded-full bg-teal-300" />
             {t.eyebrow}
           </div>
 
           <h1 className="mb-6 text-4xl font-extrabold leading-tight md:text-6xl">
             {t.title}
-            <span className="mt-2 block text-cyan-300">
+            <span className="mt-2 block text-teal-200">
               {isArabic ? "مدرسة الرواد الحديثة" : "Al Rowad Modern School"}
             </span>
           </h1>
 
-          <p className="max-w-2xl text-base leading-8 text-blue-100 md:text-lg">
+          <p className="max-w-2xl text-base leading-8 text-teal-50 md:text-lg">
             {t.subtitle}
           </p>
 
           <div className="mt-9 flex flex-wrap gap-4">
             <a
               href="#classes"
-              className="rounded-xl bg-cyan-400 px-7 py-3.5 font-bold text-blue-950 transition hover:bg-cyan-300"
+              className="rounded-xl bg-teal-300 px-7 py-3.5 font-bold text-[#062f3b] transition hover:bg-teal-200"
             >
               {t.viewAll}
             </a>
@@ -284,7 +437,7 @@ export default function LiveClassesPage() {
             </Link>
           </div>
 
-          <p className="mt-6 text-xs text-blue-200/70">{t.sample}</p>
+          <p className="mt-6 text-xs text-teal-100/70">{t.sample}</p>
         </div>
       </section>
 
@@ -296,30 +449,30 @@ export default function LiveClassesPage() {
               label: t.liveNow,
               value: liveCount,
               icon: "🔴",
-              color: "text-red-500",
+              color: "text-rose-500",
             },
             {
               label: t.upcoming,
               value: upcomingCount,
               icon: "📅",
-              color: "text-blue-600",
+              color: "text-[#0e7490]",
             },
             {
               label: t.ended,
               value: endedCount,
               icon: "✓",
-              color: "text-green-600",
+              color: "text-teal-600",
             },
             {
               label: t.teachers,
-              value: new Set(classes.map((item) => item.teacher)).size,
+              value: teacherCount,
               icon: "👨‍🏫",
-              color: "text-purple-600",
+              color: "text-[#075568]",
             },
           ].map((stat, index) => (
             <div
               key={index}
-              className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/50"
+              className="rounded-2xl border border-[#dcebed] bg-white p-6 shadow-lg shadow-[#075568]/5"
             >
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-500">
@@ -335,36 +488,227 @@ export default function LiveClassesPage() {
         </div>
       </section>
 
-      {/* Classes Section */}
+      {/* Classes */}
       <section id="classes" className="mx-auto max-w-7xl px-5 py-20">
         <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
-            <span className="mb-3 block font-bold text-blue-600">
+            <span className="mb-3 block font-bold text-[#0e7490]">
               {t.eyebrow}
             </span>
-            <h2 className="text-3xl font-extrabold text-slate-900 md:text-4xl">
+            <h2 className="text-3xl font-extrabold text-[#062f3b] md:text-4xl">
               {t.scheduleTitle}
             </h2>
             <p className="mt-3 text-slate-500">{t.scheduleDesc}</p>
           </div>
 
-          <div className="relative w-full md:max-w-sm">
+          <div className="flex w-full flex-col gap-3 md:max-w-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(!showForm);
+                setSuccessMessage("");
+              }}
+              className="rounded-xl bg-[#075568] px-5 py-3.5 font-bold text-white shadow-lg shadow-[#075568]/15 transition hover:bg-[#062f3b]"
+            >
+              {showForm ? "− " + t.hideForm : "+ " + t.addClass}
+            </button>
+
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t.search}
-              className="w-full rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              className="w-full rounded-xl border border-[#d5e7e9] bg-white px-5 py-4 text-sm text-[#073b4c] outline-none transition placeholder:text-slate-400 focus:border-[#0e7490] focus:ring-4 focus:ring-teal-100"
             />
-            <span
-              className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-xl text-slate-400 ${
-                isArabic ? "left-4" : "right-4"
-              }`}
-            >
-              ⌕
-            </span>
           </div>
         </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div
+            className={`mb-6 rounded-xl border px-5 py-4 font-bold ${
+              successMessage === t.success
+                ? "border-teal-200 bg-teal-50 text-teal-800"
+                : "border-red-200 bg-red-50 text-red-700"
+            }`}
+          >
+            {successMessage === t.success ? "✓ " : "⚠ "}
+            {successMessage}
+          </div>
+        )}
+
+        {/* Add Class Form */}
+        {showForm && (
+          <div className="mb-10 overflow-hidden rounded-3xl border border-[#d5e7e9] bg-white shadow-xl shadow-[#075568]/5">
+            <div className="bg-gradient-to-r from-[#062f3b] to-[#0e7490] px-6 py-6 text-white md:px-8">
+              <h3 className="text-2xl font-extrabold">{t.formTitle}</h3>
+              <p className="mt-2 text-sm text-teal-100">{t.online}</p>
+            </div>
+
+            <form onSubmit={handleAddClass} className="p-6 md:p-8">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.classTitle} *
+                  </label>
+                  <input
+                    required
+                    value={formData.title}
+                    onChange={(e) => updateField("title", e.target.value)}
+                    placeholder={t.classTitle}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.subjectName} *
+                  </label>
+                  <input
+                    required
+                    value={formData.subject}
+                    onChange={(e) => updateField("subject", e.target.value)}
+                    placeholder={t.subjectName}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.teacherName} *
+                  </label>
+                  <input
+                    required
+                    value={formData.teacher}
+                    onChange={(e) => updateField("teacher", e.target.value)}
+                    placeholder={t.teacherName}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.stageName} *
+                  </label>
+                  <select
+                    required
+                    value={formData.stage}
+                    onChange={(e) => updateField("stage", e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  >
+                    <option value="">{t.choose}</option>
+                    <option value={t.primary}>{t.primary}</option>
+                    <option value={t.preparatory}>{t.preparatory}</option>
+                    <option value={t.secondary}>{t.secondary}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.gradeName} *
+                  </label>
+                  <input
+                    required
+                    value={formData.grade}
+                    onChange={(e) => updateField("grade", e.target.value)}
+                    placeholder={t.gradeName}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.classDate} *
+                  </label>
+                  <input
+                    required
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => updateField("date", e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.classTime} *
+                  </label>
+                  <input
+                    required
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => updateField("time", e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.classDuration} *
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    min="1"
+                    value={formData.duration}
+                    onChange={(e) => updateField("duration", e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.studentsCount}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.students}
+                    onChange={(e) => updateField("students", e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3">
+                  <label className="mb-2 block text-sm font-bold text-[#073b4c]">
+                    {t.meetingLink}
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.meetingUrl}
+                    onChange={(e) => updateField("meetingUrl", e.target.value)}
+                    placeholder="https://meet.google.com/..."
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0e7490] focus:ring-2 focus:ring-teal-100"
+                  />
+                  <p className="mt-2 text-xs text-slate-400">
+                    {t.onlineLinkHint}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[#075568] px-8 py-3.5 font-bold text-white transition hover:bg-[#062f3b]"
+                >
+                  ✓ {t.addButton}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    resetForm();
+                    setSuccessMessage("");
+                  }}
+                  className="rounded-xl border border-slate-200 px-8 py-3.5 font-bold text-slate-600 transition hover:bg-slate-50"
+                >
+                  {t.cancel}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="mb-8 flex flex-wrap gap-3">
@@ -379,8 +723,8 @@ export default function LiveClassesPage() {
               onClick={() => setActiveFilter(filter.id)}
               className={`rounded-xl px-5 py-3 text-sm font-bold transition ${
                 activeFilter === filter.id
-                  ? "bg-blue-700 text-white shadow-lg shadow-blue-200"
-                  : "border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700"
+                  ? "bg-[#075568] text-white shadow-lg shadow-[#075568]/20"
+                  : "border border-[#d5e7e9] bg-white text-[#075568] hover:border-[#0e7490] hover:bg-teal-50"
               }`}
             >
               {filter.label}
@@ -394,22 +738,14 @@ export default function LiveClassesPage() {
             {filteredClasses.map((item) => (
               <article
                 key={item.id}
-                className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group overflow-hidden rounded-2xl border border-[#e0edef] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-800 to-indigo-950">
+                <div className="relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br from-[#075568] to-[#062f3b]">
                   <div className="absolute -right-8 -top-10 h-40 w-40 rounded-full border-[20px] border-white/5" />
                   <div className="absolute -bottom-14 -left-5 h-36 w-36 rounded-full border-[18px] border-white/5" />
 
                   <span className="relative text-6xl">
-                    {item.subject === "الرياضيات"
-                      ? "📐"
-                      : item.subject === "العلوم"
-                        ? "🔬"
-                        : item.subject === "اللغة الإنجليزية"
-                          ? "🌍"
-                          : item.subject === "تكنولوجيا المعلومات"
-                            ? "💻"
-                            : "📚"}
+                    {subjectIcon(item.subject)}
                   </span>
 
                   <span
@@ -417,9 +753,9 @@ export default function LiveClassesPage() {
                       isArabic ? "right-4" : "left-4"
                     } ${
                       item.status === "live"
-                        ? "bg-red-500 text-white"
+                        ? "bg-rose-500 text-white"
                         : item.status === "upcoming"
-                          ? "bg-cyan-300 text-blue-950"
+                          ? "bg-teal-200 text-[#062f3b]"
                           : "bg-slate-200 text-slate-700"
                     }`}
                   >
@@ -428,11 +764,15 @@ export default function LiveClassesPage() {
                     )}
                     {statusLabel(item.status)}
                   </span>
+
+                  <span className="absolute bottom-3 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white">
+                    {t.online}
+                  </span>
                 </div>
 
                 <div className="p-6">
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <span className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
+                    <span className="rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-bold text-[#075568]">
                       {item.subject}
                     </span>
                     <span className="text-xs text-slate-400">
@@ -440,20 +780,8 @@ export default function LiveClassesPage() {
                     </span>
                   </div>
 
-                  <h3 className="mb-4 min-h-14 text-lg font-extrabold leading-7 text-slate-900 transition group-hover:text-blue-700">
-                    {isArabic
-                      ? item.title
-                      : item.id === 1
-                        ? "Comprehensive Mathematics Revision"
-                        : item.id === 2
-                          ? "The Digestive System"
-                          : item.id === 3
-                            ? "English Grammar"
-                            : item.id === 4
-                              ? "Revision on Unit One"
-                              : item.id === 5
-                                ? "Introduction to Programming"
-                                : "Grammar Practice"}
+                  <h3 className="mb-4 min-h-14 text-lg font-extrabold leading-7 text-[#062f3b] transition group-hover:text-[#0e7490]">
+                    {item.title}
                   </h3>
 
                   <div className="mb-5 space-y-3 border-b border-slate-100 pb-5 text-sm text-slate-600">
@@ -463,7 +791,7 @@ export default function LiveClassesPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span>🎓</span>
-                      <span>{item.grade}</span>
+                      <span>{item.stage} - {item.grade}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span>📅</span>
@@ -481,22 +809,29 @@ export default function LiveClassesPage() {
                     </div>
                   </div>
 
-                  {item.status === "live" ? (
+                  {item.meetingUrl ? (
                     <a
                       href={item.meetingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full rounded-xl bg-red-500 px-5 py-3.5 text-center font-bold text-white transition hover:bg-red-600"
+                      className="block w-full rounded-xl bg-[#075568] px-5 py-3.5 text-center font-bold text-white transition hover:bg-[#062f3b]"
                     >
                       <span className="me-2">▶</span>
                       {t.join}
                     </a>
-                  ) : (
+                  ) : item.status === "ended" ? (
                     <button
                       disabled
                       className="w-full cursor-not-allowed rounded-xl bg-slate-100 px-5 py-3.5 font-bold text-slate-400"
                     >
-                      {item.status === "upcoming" ? t.waiting : t.finished}
+                      {t.finished}
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full cursor-not-allowed rounded-xl bg-teal-50 px-5 py-3.5 font-bold text-[#0e7490]"
+                    >
+                      {t.waiting}
                     </button>
                   )}
                 </div>
@@ -504,9 +839,9 @@ export default function LiveClassesPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-16 text-center">
+          <div className="rounded-2xl border border-dashed border-[#b9d5d9] bg-white px-5 py-16 text-center">
             <div className="mb-4 text-5xl">🔍</div>
-            <h3 className="mb-2 text-xl font-bold text-slate-800">
+            <h3 className="mb-2 text-xl font-bold text-[#062f3b]">
               {t.noResults}
             </h3>
             <p className="text-slate-500">{t.noResultsDesc}</p>
@@ -516,17 +851,17 @@ export default function LiveClassesPage() {
 
       {/* Call To Action */}
       <section className="px-5 pb-20">
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 to-indigo-900 px-7 py-12 text-center text-white md:px-16 md:py-16">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-r from-[#062f3b] to-[#0e7490] px-7 py-12 text-center text-white md:px-16 md:py-16">
           <div className="mb-5 text-5xl">🎓</div>
           <h2 className="mb-4 text-2xl font-extrabold md:text-4xl">
             {t.ctaTitle}
           </h2>
-          <p className="mx-auto mb-8 max-w-2xl leading-8 text-blue-100">
+          <p className="mx-auto mb-8 max-w-2xl leading-8 text-teal-50">
             {t.ctaDesc}
           </p>
           <Link
             href="/"
-            className="inline-block rounded-xl bg-cyan-400 px-8 py-3.5 font-bold text-blue-950 transition hover:bg-cyan-300"
+            className="inline-block rounded-xl bg-teal-300 px-8 py-3.5 font-bold text-[#062f3b] transition hover:bg-teal-200"
           >
             {t.backHome}
           </Link>

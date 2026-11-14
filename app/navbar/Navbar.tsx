@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -42,7 +43,9 @@ export default function Navbar() {
     <>
       {/* 1. شاشة التحميل الأولية الاحترافية والجاذبة (Splash Loader) */}
       {isLoading && (
-        <div className="fixed inset-0 z-[99999] bg-gradient-to-br from-[#062c38] via-[#0e495b] to-[#08222c] flex flex-col items-center justify-center overflow-hidden transition-all duration-700">
+        <div className="fixed inset-0 z-[99999] bg-gradient-to-br 
+        from-[#062c38] via-[#0e495b] to-[#08222c] 
+        flex flex-col items-center justify-center overflow-hidden transition-all duration-700">
           {/* الخلفية المضيئة الملونة في المنتصف */}
           <div className="absolute w-[450px] h-[450px] bg-cyan-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
           <div className="absolute w-[300px] h-[300px] bg-teal-400/15 rounded-full blur-[80px] animate-ping pointer-events-none" />
@@ -84,124 +87,8 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* 2. محتوى الـ Navbar */}
-      {/* <nav className="bg-cyan-800 text-white shadow-md">
-        <div className="container mx-auto px-4 md:px-10 py-2">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/assets/image.png"
-                alt={t.logoAlt}
-                width={80}
-                height={80}
-                className="w-14 md:w-16 h-14 md:h-16 object-contain"
-                priority
-              />
-            </Link>
 
-            <div className="flex items-center gap-8">
-              <ul className="hidden md:flex gap-6 font-medium">
-                {navData.map((item) => {
-                  const isActive = pathname === item.to;
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        href={item.to}
-                        className={`relative pb-1 transition-colors duration-200 ${
-                          isActive
-                            ? "text-cyan-200 font-bold"
-                            : "hover:text-cyan-200"
-                        } after:absolute ${
-                          language === "ar" ? "after:right-0" : "after:left-0"
-                        } after:-bottom-0.5 after:h-[2px] after:bg-white after:transition-all after:duration-300 ${
-                          isActive
-                            ? "after:w-full"
-                            : "after:w-0 hover:after:w-full"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            <div className="hidden md:flex items-center gap-4">
-              <button
-                onClick={toggleLanguage}
-                className="px-3 py-1.5 text-xs font-semibold border border-white/40 rounded-lg hover:bg-white/15 transition-colors uppercase tracking-wider"
-              >
-                {language === "ar" ? "English 🌐" : "عربي 🌐"}
-              </button>
-
-              <Link
-                href="/register"
-                className="px-5 py-2 text-sm font-medium bg-white text-cyan-800 rounded-lg shadow hover:bg-cyan-50 transition-colors"
-              >
-                {t.login}
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-2 md:hidden">
-              <button
-                onClick={toggleLanguage}
-                className="px-2 py-1 text-xs border border-white/40 rounded hover:bg-white/10"
-              >
-                {language === "ar" ? "EN" : "عربي"}
-              </button>
-
-              <button
-                onClick={() => setOpen((prev) => !prev)}
-                className="text-2xl p-1 focus:outline-none"
-                aria-label={open ? t.closeMenu : t.openMenu}
-                aria-expanded={open}
-                type="button"
-              >
-                {open ? "✕" : "☰"}
-              </button>
-            </div>
-          </div>
-
-          <div
-            className={`md:hidden transition-all duration-300 overflow-hidden ${
-              open ? "max-h-[400px] mt-4 opacity-100" : "max-h-0 opacity-0"
-            }`}
-          >
-            <ul className="flex flex-col gap-2 bg-white text-gray-800 p-4 rounded-lg shadow-lg">
-              {navData.map((item) => {
-                const isActive = pathname === item.to;
-                return (
-                  <li key={item.id} className="text-center">
-                    <Link
-                      href={item.to}
-                      onClick={() => setOpen(false)}
-                      className={`block py-2.5 px-4 rounded-md font-medium transition-colors ${
-                        isActive
-                          ? "bg-cyan-100 text-cyan-800 font-bold"
-                          : "hover:bg-cyan-50 hover:text-cyan-700"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-
-              <hr className="my-2 border-gray-200" />
-
-              <Link
-                href="/dashboard"
-                onClick={() => setOpen(false)}
-                className="w-full py-2.5 text-center rounded-md bg-cyan-800 text-white font-medium hover:bg-cyan-900 transition-colors"
-              >
-                {t.login}
-              </Link>
-            </ul>
-          </div>
-        </div>
-      </nav> */}
-      <nav className="bg-cyan-800 text-white shadow-md">
+      <nav className="bg-[#015a73] text-white shadow-md">
   <div className="container mx-auto px-3 md:px-10 py-2">
     <div className="flex items-center justify-between gap-3">
 
@@ -224,16 +111,27 @@ export default function Navbar() {
       {/* Desktop Navigation */}
       <ul className="hidden md:flex items-center gap-6 font-medium">
         {navData.map((item) => {
-          const isActive = pathname === item.to;
+          const isActive =
+            pathname === item.to ||
+            (item.to !== "/" && pathname.startsWith(item.to + "/"));
 
           return (
             <li key={item.id}>
               <Link
                 href={item.to}
-                className={`relative pb-1 transition-colors ${
+                aria-current={isActive ? "page" : undefined}
+                className={`relative inline-block pb-1 transition-colors duration-200 ${
                   isActive
                     ? "text-cyan-200 font-bold"
                     : "hover:text-cyan-200"
+                } after:content-[''] after:absolute ${
+                  language === "ar"
+                    ? "after:right-0"
+                    : "after:left-0"
+                } after:-bottom-0.5 after:h-[2px] after:bg-cyan-200 after:transition-all after:duration-300 ${
+                  isActive
+                    ? "after:w-full"
+                    : "after:w-0 hover:after:w-full"
                 }`}
               >
                 {item.label}
@@ -254,7 +152,11 @@ export default function Navbar() {
 
         <Link
           href="/register"
-          className="px-5 py-2 text-sm font-medium bg-white text-cyan-800 rounded-lg"
+          className={`px-5 py-2 text-sm font-medium bg-white text-cyan-800 rounded-lg ${
+            pathname === "/register"
+              ? "ring-2 ring-cyan-200"
+              : ""
+          }`}
         >
           {t.login}
         </Link>
@@ -289,28 +191,43 @@ export default function Navbar() {
       }`}
     >
       <ul className="flex flex-col gap-2 bg-white text-gray-800 p-4 rounded-lg shadow-lg">
-        {navData.map((item) => (
-          <li key={item.id} className="text-center">
-            <Link
-              href={item.to}
-              onClick={() => setOpen(false)}
-              className={`block py-2.5 px-4 rounded-md font-medium ${
-                pathname === item.to
-                  ? "bg-cyan-100 text-cyan-800 font-bold"
-                  : "hover:bg-cyan-50 hover:text-cyan-700"
-              }`}
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
+        {navData.map((item) => {
+          const isActive =
+            pathname === item.to ||
+            (item.to !== "/" && pathname.startsWith(item.to + "/"));
+
+          return (
+            <li key={item.id} className="text-center">
+              <Link
+                href={item.to}
+                onClick={() => setOpen(false)}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative block py-2.5 px-4 rounded-md font-medium transition-all duration-300 after:content-[''] after:absolute after:bottom-1 after:h-[2px] after:bg-cyan-200 after:transition-all after:duration-300 ${
+                  language === "ar"
+                    ? "after:right-4"
+                    : "after:left-4"
+                } ${
+                  isActive
+                    ? "bg-cyan-100 text-cyan-800 font-bold after:w-[calc(100%-2rem)]"
+                    : "hover:bg-cyan-50 hover:text-cyan-700 after:w-0 hover:after:w-[calc(100%-2rem)]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
 
         <hr className="my-2 border-gray-200" />
 
         <Link
           href="/register"
           onClick={() => setOpen(false)}
-          className="w-full py-2.5 text-center rounded-md bg-cyan-800 text-white font-medium"
+          className={`w-full py-2.5 text-center rounded-md bg-cyan-800 text-white font-medium ${
+            pathname === "/register"
+              ? "ring-2 ring-cyan-200"
+              : ""
+          }`}
         >
           {t.login}
         </Link>

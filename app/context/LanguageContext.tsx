@@ -176,7 +176,7 @@ const translations = {
     phoneText: "+20 100 000 0000",
     whatsappText: "+20 100 000 0000 (واتساب)",
     whatsappMsg: "السلام عليكم، أرغب بالاستفسار عن التسجيل في مجمع المدارس",
-    emailText: "admission@smartschools.edu.eg",
+    emailText: "admission@alrowadmodern School.edu.eg",
     workingHours: "ساعات العمل: الأحد - الخميس (8:00 صباحاً - 3:00 مسائاً)",
     formTitle: "أرسل لنا رسالة مباشرة",
     successMsg: "تم إرسال رسالتك بنجاح! فريق الدعم والقبول سيتواصل معك قريباً.",
@@ -824,7 +824,7 @@ library_book_18_desc: "تعلم التعبير والكتابة الإبداعي
     whatsappText: "+20 100 000 0000 (WhatsApp)",
     whatsappMsg:
       "Hello, I would like to inquire about registration at the school complex",
-    emailText: "admission@smartschools.edu.eg",
+    emailText: "admission@alrowadmodern School.edu.eg",
     workingHours: "Working Hours: Sun - Thu (8:00 AM - 3:00 PM)",
     formTitle: "Send Us a Direct Message",
     successMsg:
