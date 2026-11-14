@@ -322,14 +322,14 @@ export default function SchoolsSlider() {
     .sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <section className="py-24 px-4 sm:px-6 bg-[#080910] text-white relative overflow-hidden min-h-[700px]">
+    <section className="py-20 px-3 sm:px-6 bg-[#080910] text-white relative overflow-hidden w-full">
       {/* Section Title */}
-      <h2 className="text-center mb-16 font-bold text-3xl sm:text-[34px] text-[#9E7C2F] tracking-tight">
+      <h2 className="text-center mb-12 font-bold text-3xl sm:text-[34px] text-[#9E7C2F] tracking-tight">
         {language === "ar" ? "عملاؤنا" : "Our Clients"}
       </h2>
 
       {/* Slider Container */}
-      <div className="w-full max-w-6xl mx-auto overflow-visible px-2">
+      <div className="w-full max-w-5xl mx-auto px-0 overflow-hidden">
         <Swiper
           modules={[Autoplay, EffectCoverflow, Pagination]}
           effect={"coverflow"}
@@ -338,9 +338,9 @@ export default function SchoolsSlider() {
           slidesPerView={"auto"}
           initialSlide={Math.floor(schools.length / 2)}
           coverflowEffect={{
-            rotate: 20,
+            rotate: 15,
             stretch: 0,
-            depth: 120,
+            depth: 80,
             modifier: 1,
             slideShadows: false,
           }}
@@ -353,37 +353,37 @@ export default function SchoolsSlider() {
           breakpoints={{
             320: {
               slidesPerView: 1,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
             640: {
               slidesPerView: "auto",
-              spaceBetween: 30,
+              spaceBetween: 20,
             },
             1024: {
               slidesPerView: "auto",
-              spaceBetween: 40,
+              spaceBetween: 30,
             },
           }}
-          className="w-full py-10"
+          className="w-full py-6"
         >
           {schools.map((school) => (
             <SwiperSlide
               key={school.id}
-              className="!w-[290px] sm:!w-[320px] !h-[480px] transition-all duration-300"
+              className="!w-[280px] sm:!w-[320px] !h-[480px] flex justify-center"
             >
               <div
                 className="
-                  group relative bg-[#121622]
+                  w-full group relative bg-[#121622]
                   border border-[#1e2536]
-                  rounded-[32px] p-6
+                  rounded-[28px] p-5 sm:p-6
                   flex flex-col justify-between h-full
                   shadow-2xl transition-all duration-500
                   hover:border-[#9E7C2F]/50
                 "
               >
                 {/* School Image */}
-                <div className="w-full h-[190px] flex items-center justify-center relative">
-                  <div className="w-full h-full relative rounded-[20px] overflow-hidden bg-[#181e2b]">
+                <div className="w-full h-[180px] flex items-center justify-center relative">
+                  <div className="w-full h-full relative rounded-[18px] overflow-hidden bg-[#181e2b]">
                     <Image
                       src={school.logo}
                       alt={
@@ -392,7 +392,7 @@ export default function SchoolsSlider() {
                           : school.name_en
                       }
                       fill
-                      sizes="320px"
+                      sizes="(max-width: 768px) 280px, 320px"
                       className="
                         object-cover transition-transform
                         duration-500 group-hover:scale-105
@@ -402,7 +402,7 @@ export default function SchoolsSlider() {
                 </div>
 
                 {/* School Information */}
-                <div className="text-center my-4 flex-grow flex flex-col justify-center">
+                <div className="text-center my-3 flex-grow flex flex-col justify-center">
                   <h3
                     className="
                       text-white font-extrabold text-lg sm:text-xl mb-2
@@ -431,7 +431,7 @@ export default function SchoolsSlider() {
                         text-gray-200 hover:text-black
                         border border-[#2e374e]
                         hover:border-[#9E7C2F]
-                        rounded-2xl py-3 text-sm font-semibold
+                        rounded-xl py-3 text-sm font-semibold
                         transition-all duration-300
                       "
                     >
@@ -448,7 +448,7 @@ export default function SchoolsSlider() {
       </div>
 
       {/* Student Information Button */}
-      <div className="flex justify-center items-center mt-12">
+      <div className="flex justify-center items-center mt-10">
         <Link href="/thank-you">
           <Button
             className="
